@@ -12,10 +12,10 @@ public class GetArmut extends RequestObject {
         this.params.addProperty("player",-1);
     }
 
-    public GetArmut(int player,boolean getArmut) {
+    public GetArmut(int p,boolean getArmut) {
         this.command =COMMAND;
         this.params = new JsonObject();
-        this.params.addProperty("player",player);
+        this.params.addProperty("player",p);
         this.params.addProperty("getArmut",getArmut);
     }
 }

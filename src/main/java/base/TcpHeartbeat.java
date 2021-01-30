@@ -6,9 +6,9 @@ public class TcpHeartbeat extends RequestObject {
 
     public final static String COMMAND = "Heartbeat";
 
-    public TcpHeartbeat(String player) {
+    public TcpHeartbeat(Player player, String p) {
         this.command =COMMAND;
         this.params = new JsonObject();
-        this.params.addProperty("player",player);
+        this.params.addProperty("player",p);
     }
 }

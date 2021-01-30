@@ -16,14 +16,15 @@ public class GameSelected extends RequestObject{
     public final static String KARO = "Karosolo";
     public final static String ARMUT = "Armut";
     public final static String KOENIGE = "Könige";
+    public static final String HOCHZEIT = "Hochzeit";
 
 
     public final static String COMMAND="GameSelected";
 
-    public GameSelected(int player, String game) {
+    public GameSelected(int p, String game) {
         this.command = COMMAND;
         this.params = new JsonObject();
-        this.params.addProperty("player",player);
+        this.params.addProperty("player",p);
         this.params.addProperty("game",game);
     }
 }

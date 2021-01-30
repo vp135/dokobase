@@ -15,8 +15,7 @@ public class Compare {
 
     private final static Logger log = new Logger(Compare.class.getName());
     
-    public static final boolean normalGame (Card first, Card second, boolean schwein) {
-        //System.out.println(first.toString() +":"+ second.toString()+ " (Schwein:"+schwein+")");
+    public static final Card normalGame (Card first, Card second, boolean schwein) {
         switch (first.farbe) {
             case KREUZ: {
                 switch (first.value){
@@ -26,27 +25,27 @@ public class Compare {
                                 || second.farbe.equals(KARO)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KREUZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if(second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO)&&schwein)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
 
                         if((second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO)&&schwein)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -56,9 +55,9 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(KREUZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
@@ -66,9 +65,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(KARO)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -82,9 +81,9 @@ public class Compare {
                                 || second.farbe.equals(KARO)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(PIK))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
@@ -92,9 +91,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO)&&schwein)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
@@ -102,9 +101,9 @@ public class Compare {
                         if((second.value.equals(DAME)&& second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO)&&schwein)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -114,9 +113,9 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(PIK))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(PIK))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
@@ -124,9 +123,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(KARO)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -137,9 +136,9 @@ public class Compare {
                     case ZEHN:{
                         if((second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO)&&schwein)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
@@ -147,9 +146,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO)&&schwein)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
@@ -157,9 +156,9 @@ public class Compare {
                         if((second.value.equals(DAME)&&(second.farbe.equals(PIK)||second.farbe.equals(KREUZ)))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO)&&schwein)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -168,9 +167,9 @@ public class Compare {
                                 || (second.farbe.equals(KARO)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(HERZ)))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
@@ -178,9 +177,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || (second.farbe.equals(KARO)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ)))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -193,9 +192,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
@@ -203,9 +202,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO)&&schwein)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
@@ -213,9 +212,9 @@ public class Compare {
                         if((second.value.equals(DAME)&&!second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO)&&schwein)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -224,22 +223,22 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(KARO))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
                         if(schwein){
-                            return true;
+                            return first;
                         }
                         else{
                             if(second.value.equals(BUBE)
                                     || second.value.equals(DAME)
                                     || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                                return false;
+                                return second;
                             }else {
-                                return true;
+                                return first;
                             }
                         }
                     }
@@ -249,39 +248,39 @@ public class Compare {
 
         }
         log.error("Error");
-        return false;
+        return second;
     }
 
-    public static boolean damen(Card first, Card second) {
+    public static Card damen(Card first, Card second) {
         //System.out.println(first.toString() +":"+ second.toString());
         switch (first.farbe) {
             case KREUZ: {
                 switch (first.value){
                     case DAME: {
-                        return true;
+                        return first;
                     }
                     case ASS:{
                         if(second.value.equals(DAME)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
                         if (second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
@@ -289,9 +288,9 @@ public class Compare {
                                 || (second.value.equals(ASS) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -301,34 +300,34 @@ public class Compare {
                 switch (first.value){
                     case DAME: {
                         if(second.value.equals(DAME)&&second.farbe.equals(KREUZ)){
-                            return false;
+                            return second;
                         }
                         else{
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
                         if(second.value.equals(DAME)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
                         if (second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(PIK))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
@@ -336,9 +335,9 @@ public class Compare {
                                 || (second.value.equals(ASS) && second.farbe.equals(PIK))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(PIK))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -349,34 +348,34 @@ public class Compare {
                     case DAME: {
                         if((second.value.equals(DAME)&&second.farbe.equals(KREUZ))
                         ||(second.value.equals(DAME)&&second.farbe.equals(PIK))){
-                            return false;
+                            return second;
                         }
                         else{
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
                         if(second.value.equals(DAME)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
                         if (second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
@@ -384,9 +383,9 @@ public class Compare {
                                 || (second.value.equals(ASS) && second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -396,34 +395,34 @@ public class Compare {
                 switch (first.value){
                     case DAME: {
                         if((second.value.equals(DAME)&&!second.farbe.equals(KARO))){
-                            return false;
+                            return second;
                         }
                         else{
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
                         if(second.value.equals(DAME)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
                         if (second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
@@ -431,9 +430,9 @@ public class Compare {
                                 || (second.value.equals(ASS) && second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KARO))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -442,39 +441,39 @@ public class Compare {
 
         }
         log.error("Error");
-        return false;
+        return second;
     }
 
-    public static boolean buben(Card first, Card second) {
+    public static Card buben(Card first, Card second) {
         //System.out.println(first.toString() +":"+ second.toString());
         switch (first.farbe) {
             case KREUZ: {
                 switch (first.value){
                     case BUBE: {
-                        return true;
+                        return first;
                     }
                     case ASS:{
                         if(second.value.equals(BUBE)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(BUBE)
                                 || (second.value.equals(ASS) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
                         if (second.value.equals(BUBE)
                                 || (second.value.equals(ASS) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
@@ -482,9 +481,9 @@ public class Compare {
                                 || (second.value.equals(ASS) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -494,34 +493,34 @@ public class Compare {
                 switch (first.value){
                     case BUBE: {
                         if(second.value.equals(BUBE)&&second.farbe.equals(KREUZ)){
-                            return false;
+                            return second;
                         }
                         else{
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
                         if(second.value.equals(BUBE)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(BUBE)
                                 || (second.value.equals(ASS) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
                         if (second.value.equals(BUBE)
                                 || (second.value.equals(ASS) && second.farbe.equals(PIK))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
@@ -529,9 +528,9 @@ public class Compare {
                                 || (second.value.equals(ASS) && second.farbe.equals(PIK))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(PIK))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -542,34 +541,34 @@ public class Compare {
                     case BUBE: {
                         if((second.value.equals(BUBE)&&second.farbe.equals(KREUZ))
                                 ||(second.value.equals(BUBE)&&second.farbe.equals(PIK))){
-                            return false;
+                            return second;
                         }
                         else{
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
                         if(second.value.equals(BUBE)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(BUBE)
                                 || (second.value.equals(ASS) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
                         if (second.value.equals(BUBE)
                                 || (second.value.equals(ASS) && second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
@@ -577,9 +576,9 @@ public class Compare {
                                 || (second.value.equals(ASS) && second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -589,34 +588,34 @@ public class Compare {
                 switch (first.value){
                     case BUBE: {
                         if((second.value.equals(BUBE)&&!second.farbe.equals(KARO))){
-                            return false;
+                            return second;
                         }
                         else{
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
                         if(second.value.equals(BUBE)){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(BUBE)
                                 || (second.value.equals(ASS) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
                         if (second.value.equals(BUBE)
                                 || (second.value.equals(ASS) && second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
@@ -624,9 +623,9 @@ public class Compare {
                                 || (second.value.equals(ASS) && second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KARO))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -635,47 +634,47 @@ public class Compare {
 
         }
         log.error("Error");
-        return false;
+        return second;
     }
 
-    public static boolean bubendamen(Card first, Card second) {
+    public static Card bubendamen(Card first, Card second) {
         //System.out.println(first.toString() + ":" + second.toString());
         switch (first.farbe) {
             case KREUZ: {
                 switch (first.value) {
                     case DAME: {
-                        return true;
+                        return first;
                     }
                     case BUBE: {
                         if (second.value.equals(DAME)) {
-                            return false;
+                            return second;
                         }
                         else{
-                            return true;
+                            return first;
                         }
                     }
                     case ASS: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -685,41 +684,41 @@ public class Compare {
                 switch (first.value) {
                     case DAME: {
                         if (second.value.equals(DAME) && second.farbe.equals(KREUZ)) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE: {
                         if (second.value.equals(DAME)
                                 || (second.value.equals(BUBE) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(PIK))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -730,42 +729,42 @@ public class Compare {
                     case DAME: {
                         if ((second.value.equals(DAME) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(DAME) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE: {
                         if (second.value.equals(DAME)
                                 || (second.value.equals(BUBE) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(BUBE) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -775,41 +774,41 @@ public class Compare {
                 switch (first.value) {
                     case DAME: {
                         if (second.value.equals(DAME) && !second.farbe.equals(KARO)) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE: {
                         if (second.value.equals(DAME)
                                 || (second.value.equals(BUBE) && !second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case ZEHN: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG: {
                         if (second.value.equals(BUBE) || second.value.equals(DAME)
                                 || (second.value.equals(ASS) && second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -818,39 +817,39 @@ public class Compare {
 
         }
         log.error("Error");
-        return false;
+        return second;
     }
 
-    public static boolean fleischlos(Card first, Card second) {
+    public static Card fleischlos(Card first, Card second) {
         //System.out.println(first.toString() + ":" + second.toString());
         switch (first.farbe) {
             case KREUZ: {
                 switch (first.value) {
                     case ASS: {
-                        return true;
+                        return first;
                     }
                     case ZEHN: {
                         if (second.value.equals(ASS) && second.farbe.equals(KREUZ)) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG: {
                         if ((second.value.equals(ASS) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME: {
                         if ((second.value.equals(ASS) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE: {
@@ -858,10 +857,10 @@ public class Compare {
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(KREUZ))
                                 || (second.value.equals(DAME) && second.farbe.equals(KREUZ))) {
-                            return false;
+                            return second;
                         }
                         else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -870,30 +869,30 @@ public class Compare {
             case PIK: {
                 switch (first.value) {
                     case ASS: {
-                        return true;
+                        return first;
                     }
                     case ZEHN: {
                         if (second.value.equals(ASS) && second.farbe.equals(PIK)) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG: {
                         if ((second.value.equals(ASS) && second.farbe.equals(PIK))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME: {
                         if ((second.value.equals(ASS) && second.farbe.equals(PIK))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(PIK))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE: {
@@ -901,10 +900,10 @@ public class Compare {
                                 || (second.value.equals(ZEHN) && second.farbe.equals(PIK))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(PIK))
                                 || (second.value.equals(DAME) && second.farbe.equals(PIK))) {
-                            return false;
+                            return second;
                         }
                         else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -914,30 +913,30 @@ public class Compare {
             case HERZ: {
                 switch (first.value) {
                     case ASS: {
-                        return true;
+                        return first;
                     }
                     case ZEHN: {
                         if (second.value.equals(ASS) && second.farbe.equals(HERZ)) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG: {
                         if ((second.value.equals(ASS) && second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME: {
                         if ((second.value.equals(ASS) && second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE: {
@@ -945,9 +944,9 @@ public class Compare {
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(HERZ))
                                 || (second.value.equals(DAME) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -956,30 +955,30 @@ public class Compare {
             case KARO: {
                 switch (first.value) {
                     case ASS: {
-                        return true;
+                        return first;
                     }
                     case ZEHN: {
                         if (second.value.equals(ASS) && second.farbe.equals(KARO)) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG: {
                         if ((second.value.equals(ASS) && second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME: {
                         if ((second.value.equals(ASS) && second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KARO))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE: {
@@ -987,10 +986,10 @@ public class Compare {
                                 || (second.value.equals(ZEHN) && second.farbe.equals(KARO))
                                 || (second.value.equals(KOENIG) && second.farbe.equals(KARO))
                                 || (second.value.equals(DAME) && second.farbe.equals(KARO))) {
-                            return false;
+                            return second;
                         }
                         else{
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -998,10 +997,10 @@ public class Compare {
             }
         }
         log.error("Error");
-        return false;
+        return second;
     }
 
-    public static boolean kreuz(Card first, Card second) {
+    public static Card kreuz(Card first, Card second) {
         //System.out.println(first.toString() +":"+ second.toString());
         switch (first.farbe) {
             case KREUZ: {
@@ -1011,25 +1010,25 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KREUZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if(second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
 
                         if((second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1038,18 +1037,18 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(KREUZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KREUZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
                         if(second.value.equals(BUBE)
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1063,27 +1062,27 @@ public class Compare {
                                 || second.farbe.equals(KREUZ)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(PIK))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if((second.value.equals(BUBE)&&second.farbe.equals(KREUZ))
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
 
                         if((second.value.equals(DAME)&& second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1093,9 +1092,9 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(PIK))
                                 || (second.value.equals(ASS)&&second.farbe.equals(PIK))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
@@ -1103,9 +1102,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(KREUZ)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1115,26 +1114,26 @@ public class Compare {
                 switch (first.value){
                     case ZEHN:{
                         if((second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if((second.value.equals(BUBE)&&(second.farbe.equals(PIK)||second.farbe.equals(KREUZ)))
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
                         if((second.value.equals(DAME)&&(second.farbe.equals(PIK)||second.farbe.equals(KREUZ)))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1143,9 +1142,9 @@ public class Compare {
                                 || second.farbe.equals(KREUZ)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
@@ -1153,9 +1152,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(KREUZ)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1169,27 +1168,27 @@ public class Compare {
                                 || second.farbe.equals(KREUZ)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if((second.value.equals(BUBE)&&!second.farbe.equals(KARO))
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
 
                         if((second.value.equals(DAME)&&!second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1199,9 +1198,9 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(KARO))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS: {
@@ -1209,9 +1208,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(KREUZ)
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1220,10 +1219,10 @@ public class Compare {
 
         }
         log.error("Error");
-        return false;
+        return second;
     }
 
-    public static boolean pik(Card first, Card second) {
+    public static Card pik(Card first, Card second) {
         //System.out.println(first.toString() +":"+ second.toString());
         switch (first.farbe) {
             case KREUZ: {
@@ -1234,25 +1233,25 @@ public class Compare {
                                 || second.farbe.equals(PIK)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KREUZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if(second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
 
                         if((second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1262,9 +1261,9 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(KREUZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KREUZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
@@ -1272,9 +1271,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(PIK)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1287,27 +1286,27 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(PIK))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if((second.value.equals(BUBE)&&second.farbe.equals(KREUZ))
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
 
                         if((second.value.equals(DAME)&& second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1316,18 +1315,18 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(PIK))
                                 || (second.value.equals(ASS)&&second.farbe.equals(PIK))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
                         if(second.value.equals(BUBE)
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1337,26 +1336,26 @@ public class Compare {
                 switch (first.value){
                     case ZEHN:{
                         if((second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if((second.value.equals(BUBE)&&(second.farbe.equals(PIK)||second.farbe.equals(KREUZ)))
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
                         if((second.value.equals(DAME)&&(second.farbe.equals(PIK)||second.farbe.equals(KREUZ)))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1365,9 +1364,9 @@ public class Compare {
                                 || second.farbe.equals(PIK)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
@@ -1375,9 +1374,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(PIK)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1391,27 +1390,27 @@ public class Compare {
                                 || second.farbe.equals(PIK)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if((second.value.equals(BUBE)&&!second.farbe.equals(KARO))
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
 
                         if((second.value.equals(DAME)&&!second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1421,9 +1420,9 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(KARO))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS: {
@@ -1431,9 +1430,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(PIK)
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1442,10 +1441,10 @@ public class Compare {
 
         }
         log.error("Error");
-        return false;
+        return second;
     }
 
-    public static boolean herz(Card first, Card second) {
+    public static Card herz(Card first, Card second) {
         //System.out.println(first.toString() +":"+ second.toString());
         switch (first.farbe) {
             case KREUZ: {
@@ -1456,25 +1455,24 @@ public class Compare {
                                 || second.farbe.equals(HERZ)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KREUZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if(second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
-
                         if((second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1484,9 +1482,9 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(KREUZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KREUZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
@@ -1494,9 +1492,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(HERZ)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1510,27 +1508,27 @@ public class Compare {
                                 || second.farbe.equals(HERZ)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(PIK))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if((second.value.equals(BUBE)&&second.farbe.equals(KREUZ))
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
 
                         if((second.value.equals(DAME)&& second.farbe.equals(KREUZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1540,9 +1538,9 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(PIK))
                                 || (second.value.equals(ASS)&&second.farbe.equals(PIK))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
@@ -1550,9 +1548,9 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(HERZ)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1562,26 +1560,26 @@ public class Compare {
                 switch (first.value){
                     case ZEHN:{
                         if((second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if((second.value.equals(BUBE)&&(second.farbe.equals(PIK)||second.farbe.equals(KREUZ)))
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
                         if((second.value.equals(DAME)&&(second.farbe.equals(PIK)||second.farbe.equals(KREUZ)))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1589,18 +1587,18 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ)
                                 || (second.value.equals(ASS)&&second.farbe.equals(HERZ)))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS:{
                         if(second.value.equals(BUBE)
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                 }
@@ -1614,27 +1612,27 @@ public class Compare {
                                 || second.farbe.equals(HERZ)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case BUBE:{
                         if((second.value.equals(BUBE)&&!second.farbe.equals(KARO))
                                 || second.value.equals(DAME)
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case DAME:{
 
                         if((second.value.equals(DAME)&&!second.farbe.equals(KARO))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case KOENIG:{
@@ -1644,9 +1642,9 @@ public class Compare {
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(HERZ))
                                 || (second.value.equals(ZEHN)&&second.farbe.equals(KARO))
                                 || (second.value.equals(ASS)&&second.farbe.equals(KARO))){
-                            return false;
+                            return second;
                         }else {
-                            return true;
+                            return first;
                         }
                     }
                     case ASS: {
@@ -1654,21 +1652,17 @@ public class Compare {
                                 || second.value.equals(DAME)
                                 || second.farbe.equals(HERZ)
                                 || (second.value.equals(ZEHN) && second.farbe.equals(HERZ))) {
-                            return false;
+                            return second;
                         } else {
-                            return true;
+                            return first;
                         }
                     }
                 }
                 break;
             }
-
         }
         log.error("Error");
-        return false;
+        return second;
     }
 
-    public static boolean karo(Card first, Card second, boolean schwein) {
-        return normalGame(first,second,schwein);
-    }
 }

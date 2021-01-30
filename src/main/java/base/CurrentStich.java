@@ -1,5 +1,6 @@
 package base;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.util.Map;
@@ -11,31 +12,24 @@ public class CurrentStich extends RequestObject {
     public final static String ALL = "AllStich";
     public final static String SPECIFIC = "SpecificStich";
 
-    public CurrentStich(Map<Integer,Card> map){
+    public CurrentStich(Map<Card, Integer> map){
         this.command = CURRENT;
         this.params = new JsonObject();
-        this.params.addProperty("player","all");
-        map.keySet().forEach(p->params.addProperty(p.toString(),map.get(p).toString()));
+        map.keySet().forEach(p->{
+            this.params.addProperty(map.get(p).toString(),p.farbe+" "+p.value);
+        });
     }
 
-    public CurrentStich(int player){
-        this.command = LAST;
-        this.params = new JsonObject();
-        this.params.addProperty("player",player);
+    public CurrentStich(Map<Card, Integer> map, boolean isLast) {
+        this(map);
+        if (isLast){
+            this.command = LAST;
+        }
     }
 
-    public CurrentStich(Map<Integer,Card> map, int player) {
-        this.command = LAST;
-        this.params = new JsonObject();
-        this.params.addProperty("player", "all");
-        map.keySet().forEach(p -> params.addProperty(p.toString(), map.get(p).toString()));
-
-    }
-
-    public static CurrentStich specificStich(Map<Integer,Card> map){
-        CurrentStich currentStich = new CurrentStich(map);
-        currentStich.command = SPECIFIC;
-        return currentStich;
+    public CurrentStich(Map<Card, Integer> map, String command){
+        this(map);
+        this.command = command;
     }
 
 }

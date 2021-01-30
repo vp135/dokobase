@@ -6,9 +6,9 @@ public class ReadyForNextRound extends RequestObject {
 
     public final static String COMMAND = "ReadyForNextRound";
 
-    public ReadyForNextRound(int player) {
+    public ReadyForNextRound(int p) {
         this.command =COMMAND;
         this.params = new JsonObject();
-        this.params.addProperty("player",player);
+        this.params.addProperty("player",p);
     }
 }

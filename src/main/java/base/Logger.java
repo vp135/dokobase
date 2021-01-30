@@ -5,11 +5,12 @@ import java.time.LocalDateTime;
 
 public class Logger {
 
-    private final static String filename = "doko.log";
+    private final String filename;
     private final String name;
 
     public Logger(String name) {
         this.name = name;
+        this.filename = name + ".log";
     }
 
     private void writeLog(String logLevel, String msg){

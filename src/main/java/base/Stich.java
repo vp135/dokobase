@@ -1,119 +1,94 @@
 package base;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class Stich {
 
-    private final static String ZEHN = "10";
-    private final static String BUBE = "Bube";
-    private final static String DAME = "Dame";
-    private final static String KOENIG = "Koenig";
-    private final static String ASS = "Ass";
 
-    private List<Integer> playerList;
-
-    HashMap<Integer, Card> cardMap = new HashMap<>();
+    private transient HashMap<Card, Integer> cardMap = new HashMap<>();
+    private HashMap<Card,String> cardPlayerMap = new HashMap<>();
+    private int points;
+    private int winner;
 
 
-    public HashMap<Integer,Card> getCardMap() {
+    public void addCard(Player player, Card card){
+        card.order= cardMap.size();
+        cardMap.put(card, player.getNumber());
+        cardPlayerMap.put(card,player.getName());
+    }
+
+    public HashMap<Card, Integer> getCardMap() {
         return cardMap;
     }
 
-    @Override
-    public String toString() {
-        return cardMap.get(0)+ "\n"+
-                cardMap.get(1)+ "\n"+
-                cardMap.get(2)+ "\n"+
-                cardMap.get(3);
+    public int getWinner(){
+        return winner;
     }
 
-    public int getWinner(String gameType,int playerFirstCard ,boolean schwein) {
-        int currentWinner=playerFirstCard;
-        boolean won = true;
+    public int getWinner(String gameType,boolean schwein) {
+        Card currentWinner = cardMap.keySet().stream().filter(card -> card.order==0).findFirst().get();
         if(cardMap.size()==4){
-            List<Card> otherCards = new ArrayList<>();
-            int nextCard=playerFirstCard;
-            playerList =new ArrayList<>();
-            cardMap.keySet().forEach(p->playerList.add(p));
-            int maxPlayerNumber= findMax(playerList.get(0),playerList.get(1),playerList.get(2),playerList.get(3));
-            while(otherCards.size()<3){
-                nextCard++;
-                if(nextCard>maxPlayerNumber){
-                    nextCard=0;
-                }
-                if(cardMap.containsKey(nextCard)) {
-                    otherCards.add(cardMap.get(nextCard));
-                }
-            }
-            int nextPlayer = playerList.indexOf(currentWinner);
-            for (int i =0;i<otherCards.size();i++) {
-                nextPlayer++;
-                if(nextPlayer>3){
-                    nextPlayer=0;
-                }
+            for(int i = 1; i<cardMap.size();i++){
+                int finalI = i;
+                Card nextCard = cardMap.keySet().stream().filter(card -> card.order== finalI).findFirst().get();
                 switch (gameType) {
                     case GameSelected.NORMAL:
-                        won = Compare.normalGame(cardMap.get(currentWinner), otherCards.get(i), schwein);
+                    case GameSelected.ARMUT:
+                    case GameSelected.KARO:
+                        currentWinner = Compare.normalGame(currentWinner, nextCard, schwein);
                         break;
                     case GameSelected.DAMEN:
-                        won = Compare.damen(cardMap.get(currentWinner), otherCards.get(i));
+                        currentWinner = Compare.damen(currentWinner, nextCard);
                         break;
                     case GameSelected.BUBEN:
-                        won = Compare.buben(cardMap.get(currentWinner), otherCards.get(i));
+                        currentWinner = Compare.buben(currentWinner, nextCard);
                         break;
                     case GameSelected.BUBENDAMEN:
-                        won = Compare.bubendamen(cardMap.get(currentWinner), otherCards.get(i));
+                        currentWinner = Compare.bubendamen(currentWinner, nextCard);
                         break;
                     case GameSelected.FLEISCHLOS:
-                        won = Compare.fleischlos(cardMap.get(currentWinner), otherCards.get(i));
+                        currentWinner = Compare.fleischlos(currentWinner, nextCard);
                         break;
                     case GameSelected.KREUZ:
-                        won = Compare.kreuz(cardMap.get(currentWinner), otherCards.get(i));
+                        currentWinner = Compare.kreuz(currentWinner, nextCard);
                         break;
                     case GameSelected.PIK:
-                        won = Compare.pik(cardMap.get(currentWinner), otherCards.get(i));
+                        currentWinner = Compare.pik(currentWinner, nextCard);
                         break;
                     case GameSelected.HERZ:
-                        won = Compare.herz(cardMap.get(currentWinner), otherCards.get(i));
+                        currentWinner = Compare.herz(currentWinner, nextCard);
                         break;
-                    case GameSelected.KARO:
-                        won = Compare.karo(cardMap.get(currentWinner), otherCards.get(i), schwein);
-                        break;
-                    case GameSelected.ARMUT:
-                        won = Compare.normalGame(cardMap.get(currentWinner),otherCards.get(i),schwein);
-                        break;
-                }
-                if (!won) {
-                    currentWinner = playerList.get(nextPlayer);
                 }
             }
         }
-        return currentWinner;
+        //cardMap.get(currentWinner).addStich(this);
+        //player = cardMap.get(currentWinner).getName();
+        this.points = calculatePoints();
+        winner = cardMap.get(currentWinner);
+        return cardMap.get(currentWinner);
     }
 
     public int calculatePoints(){
         int result=0;
-        for (Card card:this.cardMap.values()){
+        for (Card card:this.cardMap.keySet()){
             switch (card.value){
-                case ZEHN:{
+                case Statics.ZEHN:{
                     result+=10;
                     break;
                 }
-                case BUBE:{
+                case Statics.BUBE:{
                     result+=2;
                     break;
                 }
-                case DAME:{
+                case Statics.DAME:{
                     result+=3;
                     break;
                 }
-                case KOENIG:{
+                case Statics.KOENIG:{
                     result+=4;
                     break;
                 }
-                case ASS:{
+                case Statics.ASS:{
                     result+=11;
                     break;
                 }
@@ -122,13 +97,20 @@ public class Stich {
         return result;
     }
 
-    private int findMax(int... vals) {
-        int max = Integer.MIN_VALUE;
+    public int getPoints() {
+        return points;
+    }
 
-        for (int d : vals) {
-            if (d > max) max = d;
-        }
-
-        return max;
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        cardMap.keySet().forEach(card -> s
+                .append(cardMap.get(card))
+                .append(":")
+                .append(card.farbe)
+                .append(" ")
+                .append(card.value)
+                .append("\n"));
+        return s.toString();
     }
 }
