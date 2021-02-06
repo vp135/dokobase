@@ -16,7 +16,7 @@ public class GameEnd extends RequestObject {
         for(int i = 0; i<players.size();i++){
             array.add(map.get(i) + (players.get(i).isRe() ? "(Re)":"(Kontra)"));
         }
-        map.keySet().forEach(p->array.add(String.valueOf(map.get(p))+"("));
+        map.keySet().forEach(p->array.add(map.get(p) +"("));
         this.params.add("result",array);
         for (int i = 0;i<stichList.size();i++) {
             this.params.addProperty("s"+ i,stichList.get(i).calculatePoints());

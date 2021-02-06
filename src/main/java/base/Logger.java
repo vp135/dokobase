@@ -22,7 +22,7 @@ public class Logger {
                     replace("T"," ").split("\\.")[0];
             out.println(timestamp+" - " +logLevel+" - "+ name +" - "+ msg);
         } catch (IOException e) {
-            //exception handling left as an exercise for the reader
+            e.printStackTrace();
         }
     }
 

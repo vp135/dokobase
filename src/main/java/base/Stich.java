@@ -5,8 +5,7 @@ import java.util.HashMap;
 public class Stich {
 
 
-    private transient HashMap<Card, Integer> cardMap = new HashMap<>();
-    private HashMap<Card,String> cardPlayerMap = new HashMap<>();
+    private final transient HashMap<Card, Integer> cardMap = new HashMap<>();
     private int points;
     private int winner;
 
@@ -14,7 +13,6 @@ public class Stich {
     public void addCard(Player player, Card card){
         card.order= cardMap.size();
         cardMap.put(card, player.getNumber());
-        cardPlayerMap.put(card,player.getName());
     }
 
     public HashMap<Card, Integer> getCardMap() {

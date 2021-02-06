@@ -26,11 +26,8 @@ public class Card {
         else if(this.value.equals(Statics.BUBE)||this.value.equals(Statics.DAME)){
             return true;
         }
-        else if(this.farbe.equals(Statics.HERZ) && this.value.equals(Statics.ZEHN)){
-            return true;
-        }
-        else{
-            return false;
+        else {
+            return this.farbe.equals(Statics.HERZ) && this.value.equals(Statics.ZEHN);
         }
     }
 
