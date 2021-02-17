@@ -20,7 +20,7 @@ public class Logger {
         {
             String timestamp = LocalDateTime.now().toString().
                     replace("T"," ").split("\\.")[0];
-            out.println(timestamp+" - " +logLevel+" - "+ name +" - "+ msg);
+            out.println(timestamp+" - " +logLevel+" - "+ Thread.currentThread().getId()+" - " + name +" - "+ msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
