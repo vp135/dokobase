@@ -1,14 +1,30 @@
 package base;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Stich {
 
+    private final static Logger log = new Logger("Stich",3, true);
 
     private final transient HashMap<Card, Integer> cardMap = new HashMap<>();
     private int points;
     private int winner;
+    private final int stichnumber;
+    private int doppelkopf =0 ;
+    private int karlchen = 0;
+    private int fuchsGefangen = 0;
+    private int herzstich = 0;
+    private Card winningCard;
+    private int summe;
+    private final List<Player> players;
 
+
+    public Stich(List<Player> players, int stichnumber){
+        this.players = players;
+        this.stichnumber = stichnumber;
+    }
 
     public void addCard(Player player, Card card){
         card.order= cardMap.size();
@@ -59,10 +75,10 @@ public class Stich {
                 }
             }
         }
-        //cardMap.get(currentWinner).addStich(this);
-        //player = cardMap.get(currentWinner).getName();
         this.points = calculatePoints();
         winner = cardMap.get(currentWinner);
+        winningCard = currentWinner;
+        check4ExtraPoints();
         return cardMap.get(currentWinner);
     }
 
@@ -92,12 +108,81 @@ public class Stich {
                 }
             }
         }
+        summe = result;
         return result;
     }
 
     public int getPoints() {
         return points;
     }
+
+    public String getExtraPoints(){
+        StringBuilder builder = new StringBuilder();
+        if (doppelkopf>0){
+            builder.append("Doppelkopf");
+        }
+        if (karlchen>0){
+            if(builder.length()>0){
+                builder.append(";");
+            }
+            builder.append("Karlchen");
+        }
+        if (herzstich>0){
+            if(builder.length()>0){
+                builder.append(";");
+            }
+            builder.append("Herzstich");
+        }
+        if (fuchsGefangen>0){
+            if(builder.length()>0){
+                builder.append(";");
+            }
+            builder.append("Fuchs gefangen(").append(fuchsGefangen).append(")");
+        }
+        return builder.toString();
+    }
+
+    public void check4ExtraPoints(){
+        checkKarlchen();
+        checkDoppelkopf();
+        checkHerzStich();
+        checkFuchsGefangen();
+    }
+
+    private void checkFuchsGefangen() {
+        fuchsGefangen = 0;
+        cardMap.keySet().stream().filter(card -> (card.farbe.equals(Statics.KARO) && card.value.equals(Statics.ASS)))
+                .collect(Collectors.toList()).forEach(card -> {
+            if (players.get(cardMap.get(card)).isRe() != players.get(winner).isRe()) {
+                fuchsGefangen++;
+                log.info("Fuchs gefangen");
+            }
+        });
+    }
+
+    private void checkHerzStich() {
+        if(winningCard.farbe.equals(Statics.HERZ) && !winningCard.trumpf){
+            herzstich = 1;
+        }
+    }
+
+    private void checkDoppelkopf() {
+        if(summe>39){
+            doppelkopf = 1;
+            log.info("Doppelkopf");
+        }
+    }
+
+    private void checkKarlchen() {
+        if(stichnumber==9){
+            if(winningCard.farbe.equals(Statics.KREUZ) && winningCard.value.equals(Statics.BUBE)){
+                karlchen = 1;
+                log.info("Karlchen");
+            }
+        }
+    }
+
+
 
     @Override
     public String toString() {

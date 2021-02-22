@@ -12,7 +12,7 @@ public class Player {
     private boolean re;
     private int points;
 
-    private Logger log = new Logger("Players");
+    private final Logger log = new Logger("Players",3,true);
 
 
     public Player(String name, int number, Socket socket, boolean spectator, boolean re) {
