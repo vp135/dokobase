@@ -139,7 +139,12 @@ public class Stich {
             }
             builder.append("Fuchs gefangen(").append(fuchsGefangen).append(")");
         }
-        return builder.toString();
+        if(builder.length()>0){
+            return "("+builder.toString()+")";
+        }
+        else {
+            return "";
+        }
     }
 
     public void check4ExtraPoints(){

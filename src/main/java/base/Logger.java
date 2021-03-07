@@ -8,6 +8,7 @@ public class Logger {
     private final String filename;
     private final String name;
     private int loglevel;
+    private long lastlogged;
 
     public Logger(String name, int loglevel){
         this(name, loglevel, false);
@@ -20,6 +21,7 @@ public class Logger {
             deleteLogFile(filename);
         }
         this.loglevel = loglevel;
+        this.lastlogged = System.currentTimeMillis();
     }
 
     private void writeLog(String logLevel, String msg){
@@ -29,7 +31,9 @@ public class Logger {
         {
             String timestamp = LocalDateTime.now().toString().
                     replace("T"," ").split("\\.")[0];
-            out.println(timestamp+" - " +logLevel+" - "+ Thread.currentThread().getId()+" - " + name +" - "+ msg);
+            out.println(timestamp+"("+(System.currentTimeMillis()-lastlogged)+") - " +logLevel
+                    +" - "+ Thread.currentThread().getId()+" - " + name +" - "+ msg);
+            lastlogged = System.currentTimeMillis();
         } catch (IOException e) {
             e.printStackTrace();
         }
