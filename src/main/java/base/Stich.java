@@ -19,11 +19,13 @@ public class Stich {
     private Card winningCard;
     private int summe;
     private final List<Player> players;
+    private String gameType;
 
 
-    public Stich(List<Player> players, int stichnumber){
+    public Stich(List<Player> players, int stichnumber, String gameType){
         this.players = players;
         this.stichnumber = stichnumber;
+        this.gameType = gameType;
     }
 
     public void addCard(Player player, Card card){
@@ -39,7 +41,7 @@ public class Stich {
         return winner;
     }
 
-    public int getWinner(String gameType,boolean schwein) {
+    public int getWinner(boolean schwein) {
         Card currentWinner = cardMap.keySet().stream().filter(card -> card.order==0).findFirst().get();
         if(cardMap.size()==4){
             for(int i = 1; i<cardMap.size();i++){
@@ -148,10 +150,30 @@ public class Stich {
     }
 
     public void check4ExtraPoints(){
-        checkKarlchen();
         checkDoppelkopf();
-        checkHerzStich();
-        checkFuchsGefangen();
+        if(gameType.equals(GameSelected.NORMAL)
+                ||gameType.equals(GameSelected.ARMUT)
+                ||gameType.equals(GameSelected.HOCHZEIT)
+                ||gameType.equals(GameSelected.HERZ)
+                ||gameType.equals(GameSelected.KARO)
+                ||gameType.equals(GameSelected.KREUZ)
+                ||gameType.equals(GameSelected.PIK)) {
+            checkKarlchen();
+        }
+        if(gameType.equals(GameSelected.NORMAL)
+                ||gameType.equals(GameSelected.ARMUT)
+                ||gameType.equals(GameSelected.HOCHZEIT)
+                ||gameType.equals(GameSelected.KARO)
+                ||gameType.equals(GameSelected.KREUZ)
+                ||gameType.equals(GameSelected.PIK)) {
+            checkHerzStich();
+        }
+        if(gameType.equals(GameSelected.NORMAL)
+                ||gameType.equals(GameSelected.ARMUT)
+                ||gameType.equals(GameSelected.HOCHZEIT)
+                ||gameType.equals(GameSelected.KARO)) {
+            checkFuchsGefangen();
+        }
     }
 
     private void checkFuchsGefangen() {
