@@ -2,7 +2,7 @@ package base;
 
 public class Compare {
 
-    private final static Logger log = new Logger(Compare.class.getName());
+    private final static Logger log = new Logger(Compare.class.getName(),1);
     
     public static Card normalGame (Card first, Card second, boolean schwein) {
         switch (first.farbe) {

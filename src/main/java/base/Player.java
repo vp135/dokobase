@@ -12,6 +12,8 @@ public class Player {
     private boolean re;
     private int points;
 
+    private final Logger log = new Logger("Players",3,true);
+
 
     public Player(String name, int number, Socket socket, boolean spectator, boolean re) {
         this.name = name;
@@ -67,6 +69,13 @@ public class Player {
 
     public void setRe(boolean re) {
         this.re = re;
+    }
+
+    public void setRe(boolean re, String sender){
+        this.re = re;
+        if(re){
+            log.info(this.getName()+ " is Re. Reason: "+ sender);
+        }
     }
 
     public int getPoints() {

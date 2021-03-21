@@ -6,9 +6,10 @@ public class PutCard extends RequestObject {
 
     public final static String COMMAND = "PutCard";
 
-    public PutCard(String farbe, String wert) {
+    public PutCard(int player, String farbe, String wert) {
         this.command = COMMAND;
         this.params = new JsonObject();
+        this.params.addProperty("player",player);
         this.params.addProperty("farbe",farbe);
         this.params.addProperty("wert",wert);
     }

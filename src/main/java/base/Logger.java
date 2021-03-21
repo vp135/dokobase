@@ -7,10 +7,21 @@ public class Logger {
 
     private final String filename;
     private final String name;
+    private int loglevel;
+    private long lastlogged;
 
-    public Logger(String name) {
+    public Logger(String name, int loglevel){
+        this(name, loglevel, false);
+    }
+
+    public Logger(String name, int loglevel, boolean append) {
         this.name = name;
         this.filename = name + ".log";
+        if(!append) {
+            deleteLogFile(filename);
+        }
+        this.loglevel = loglevel;
+        this.lastlogged = System.currentTimeMillis();
     }
 
     private void writeLog(String logLevel, String msg){
@@ -20,23 +31,44 @@ public class Logger {
         {
             String timestamp = LocalDateTime.now().toString().
                     replace("T"," ").split("\\.")[0];
-            out.println(timestamp+" - " +logLevel+" - "+ name +" - "+ msg);
+            out.println(timestamp+"("+(System.currentTimeMillis()-lastlogged)+") - " +logLevel
+                    +" - "+ Thread.currentThread().getId()+" - " + name +" - "+ msg);
+            lastlogged = System.currentTimeMillis();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void error(String msg){
-        writeLog("error",msg);
+        if(loglevel>0) {
+            writeLog("error", msg);
+        }
     }
 
     public void warn(String msg){
-        writeLog("warn",msg);
+        if(loglevel>1) {
+            writeLog("warn", msg);
+        }
     }
 
     public void info(String msg){
-        writeLog("info",msg);
+        if(loglevel>2) {
+            writeLog("info", msg);
+        }
     }
 
+    private void deleteLogFile(String filename){
+        try {
+            File f = new File(filename);
+            if(f.exists()) {
+                f.delete();
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
 
+    public void setLoglevel(int loglevel) {
+        this.loglevel = loglevel;
+    }
 }
