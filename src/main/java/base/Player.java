@@ -1,5 +1,8 @@
 package base;
 
+import base.Logger;
+import base.doko.Card;
+
 import java.net.Socket;
 import java.util.List;
 

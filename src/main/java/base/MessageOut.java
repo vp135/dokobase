@@ -1,5 +1,7 @@
 package base;
 
+import base.messages.RequestObject;
+
 import java.net.Socket;
 
 public class MessageOut {
