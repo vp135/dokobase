@@ -34,7 +34,7 @@ public class Stich {
     }
 
     public void addCard(Player player, Card card){
-        card.trumpf = Card.isTrumpf(card, gameType);
+        card.trumpf = card.isTrumpf(gameType);
         card.order= cardMap.size();
         cardMap.put(card, player.getNumber());
     }

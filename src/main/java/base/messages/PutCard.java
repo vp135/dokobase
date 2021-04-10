@@ -1,4 +1,4 @@
-package base.doko.messages;
+package base.messages;
 
 import base.messages.RequestObject;
 import com.google.gson.JsonObject;

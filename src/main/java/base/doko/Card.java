@@ -1,5 +1,6 @@
 package base.doko;
 
+import base.BaseCard;
 import base.Statics;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class Card {
+public class Card extends BaseCard {
     public int order;
     public String value;
     public String farbe;
@@ -15,18 +16,16 @@ public class Card {
 
 
     public Card(String value, String farbe){
-        this.value = value;
-        this.farbe = farbe;
-        this.trumpf = isTrumpf();
+        super(value,farbe,false);
+        this.isTrumpf(null);
     }
 
     public Card(String value, String farbe, boolean trumpf) {
-        this.value = value;
-        this.farbe = farbe;
-        this.trumpf = trumpf;
+        super(value,farbe,trumpf);
     }
 
-    private boolean isTrumpf() {
+    @Override
+    protected boolean isTrumpf(Object object) {
         if(this.farbe.equals(Statics.KARO)){
             return true;
         }

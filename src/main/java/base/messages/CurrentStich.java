@@ -1,4 +1,4 @@
-package base.doko.messages;
+package base.messages;
 
 import base.doko.Card;
 import base.messages.RequestObject;

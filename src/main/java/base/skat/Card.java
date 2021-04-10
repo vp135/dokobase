@@ -1,5 +1,6 @@
 package base.skat;
 
+import base.BaseCard;
 import base.Statics;
 import base.skat.messages.GameSelected;
 
@@ -7,37 +8,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Card {
+public class Card extends BaseCard {
 
-    public int order;
-    public String value;
-    public String farbe;
-    public boolean trumpf;
 
     public Card(String value, String farbe){
-        this.value = value;
-        this.farbe = farbe;
-        //this.trumpf = isTrumpf();
+        super(value,farbe,false);
     }
 
-    public Card(String value, String farbe, boolean trumpf) {
-        this.value = value;
-        this.farbe = farbe;
-        //this.trumpf = trumpf;
-    }
 
-    public static boolean isTrumpf(Card card, GameSelected.GAMES gametype) {
+    protected boolean isTrumpf(Object object) {
+        GameSelected.GAMES gametype = (GameSelected.GAMES) object;
         switch (gametype){
             case GRAND:
-                return card.value.equals(Statics.BUBE);
+                return this.value.equals(Statics.BUBE);
             case KREUZ:
-                return card.value.equals(Statics.BUBE) || card.farbe.equalsIgnoreCase(Statics.KREUZ);
+                return this.value.equals(Statics.BUBE) || this.farbe.equalsIgnoreCase(Statics.KREUZ);
             case PIK:
-                return card.value.equals(Statics.BUBE) || card.farbe.equalsIgnoreCase(Statics.PIK);
+                return this.value.equals(Statics.BUBE) || this.farbe.equalsIgnoreCase(Statics.PIK);
             case HERZ:
-                return card.value.equals(Statics.BUBE) || card.farbe.equalsIgnoreCase(Statics.HERZ);
+                return this.value.equals(Statics.BUBE) || this.farbe.equalsIgnoreCase(Statics.HERZ);
             case KARO:
-                return card.value.equals(Statics.BUBE) || card.farbe.equalsIgnoreCase(Statics.KARO);
+                return this.value.equals(Statics.BUBE) || this.farbe.equalsIgnoreCase(Statics.KARO);
             case NULL:
                 return false;
         }

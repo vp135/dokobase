@@ -1,4 +1,4 @@
-package base.doko.messages;
+package base.messages;
 
 import base.Player;
 import base.messages.RequestObject;
