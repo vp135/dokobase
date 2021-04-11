@@ -1,6 +1,5 @@
 package base.messages;
 
-import base.messages.RequestObject;
 import com.google.gson.JsonObject;
 
 public class StartGame extends RequestObject {
@@ -9,6 +8,6 @@ public class StartGame extends RequestObject {
     public StartGame(String game) {
         this.command = COMMAND;
         this.params = new JsonObject();
-        this.params.addProperty("start",game);
+        this.params.addProperty("game",game);
     }
 }
