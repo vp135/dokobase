@@ -1,5 +1,6 @@
 package base.messages;
 
+import base.BaseCard;
 import base.doko.Card;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -10,7 +11,7 @@ public class Cards extends RequestObject {
 
     public final static String COMMAND ="Cards";
 
-    public Cards(List<Card> cardList) {
+    public Cards(List<BaseCard> cardList) {
         this.command = COMMAND;
         this.params = new JsonObject();
         JsonArray array = new JsonArray();

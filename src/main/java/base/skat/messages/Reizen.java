@@ -10,9 +10,9 @@ public class Reizen extends RequestObject {
 
     public final static String COMMAND = "Reizen";
 
-    public Reizen(Player player, int value, boolean active) {
+    public Reizen(String player, int value, boolean active) {
         this.command = COMMAND;
-        this.params.addProperty("player", player.getName());
+        this.params.addProperty("player", player);
         this.params.addProperty("value", value);
         this.params.addProperty("active", active);
     }
