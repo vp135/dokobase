@@ -13,7 +13,6 @@ public class Cards extends RequestObject {
 
     public Cards(List<BaseCard> cardList) {
         this.command = COMMAND;
-        this.params = new JsonObject();
         JsonArray array = new JsonArray();
         cardList.forEach(p->array.add(p.toString()));
         params.add("cards",array);

@@ -3,18 +3,24 @@ package base.skat.messages;
 import base.messages.RequestObject;
 
 public class GameSelected extends RequestObject {
+    public final static String COMMAND = "gameSelected";
+
+    public GameSelected(GAMES game, boolean hand, boolean ouvert){
+        this.command = COMMAND;
+        this.params.addProperty("game", game.name());
+        this.params.addProperty("hand", hand);
+        this.params.addProperty("ouvert", ouvert);
+    }
+
 
     public enum GAMES{
-        UNDEFINED(0),
-        KARO (9),
-        HERZ (10),
-        PIK (11),
-        KREUZ(12),
-        NULL(23),
-        GRAND(24),
-        NULL_HAND(35),
-        NULL_OUVERT(46),
-        NULL_OUVERT_HAND(59);
+        Ramsch(0),
+        Karo(9),
+        Herz(10),
+        Pik(11),
+        Kreuz(12),
+        Null(23),
+        Grand(24);
 
 
         private final int value;
@@ -28,7 +34,7 @@ public class GameSelected extends RequestObject {
                     return s;
                 }
             }
-            return UNDEFINED;
+            return Ramsch;
         }
     }
 }

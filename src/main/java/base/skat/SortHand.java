@@ -14,21 +14,18 @@ public class SortHand {
 
     public static List<BaseCard> sort(List<BaseCard> list, GameSelected.GAMES order){
         switch (order){
-            case KARO:{
+            case Karo:{
                 return sortKaro(list);
             }
-            case HERZ:
+            case Herz:
                 return sortHerz(list);
-            case PIK:
+            case Pik:
                 return sortPik(list);
-            case KREUZ:
+            case Kreuz:
                 return sortKreuz(list);
-            case NULL:
-            case NULL_HAND:
-            case NULL_OUVERT:
-            case NULL_OUVERT_HAND:
+            case Null:
                 return sortNull(list);
-            case GRAND:
+            case Grand:
                 return sortGrand(list);
             default:
                 return list;

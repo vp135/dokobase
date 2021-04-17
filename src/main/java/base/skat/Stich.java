@@ -3,15 +3,10 @@ package base.skat;
 import base.Logger;
 import base.Player;
 import base.Statics;
-import base.skat.Card;
-import base.skat.Compare;
 import base.skat.messages.GameSelected;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static base.skat.messages.GameSelected.GAMES.KARO;
 
 public class Stich {
 
@@ -55,25 +50,22 @@ public class Stich {
                 int finalI = i;
                 Card nextCard = cardMap.keySet().stream().filter(card -> card.order== finalI).findFirst().get();
                 switch (gameType) {
-                    case KARO:
+                    case Karo:
                         currentWinner = Compare.karo(currentWinner,nextCard);
                         break;
-                    case HERZ:
+                    case Herz:
                         currentWinner = Compare.herz(currentWinner,nextCard);
                         break;
-                    case PIK:
+                    case Pik:
                         currentWinner = Compare.pik(currentWinner,nextCard);
                         break;
-                    case KREUZ:
+                    case Kreuz:
                         currentWinner = Compare.kreuz(currentWinner,nextCard);
                         break;
-                    case NULL:
-                    case NULL_HAND:
-                    case NULL_OUVERT:
-                    case NULL_OUVERT_HAND:
+                    case Null:
                         currentWinner = Compare.nullspiel(currentWinner,nextCard);
                         break;
-                    case GRAND:
+                    case Grand:
                         currentWinner = Compare.grand(currentWinner,nextCard);
                         break;
                     default:

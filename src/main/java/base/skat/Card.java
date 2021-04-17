@@ -19,17 +19,17 @@ public class Card extends BaseCard {
     protected boolean isTrumpf(Object object) {
         GameSelected.GAMES gametype = (GameSelected.GAMES) object;
         switch (gametype){
-            case GRAND:
+            case Grand:
                 return this.value.equals(Statics.BUBE);
-            case KREUZ:
+            case Kreuz:
                 return this.value.equals(Statics.BUBE) || this.farbe.equalsIgnoreCase(Statics.KREUZ);
-            case PIK:
+            case Pik:
                 return this.value.equals(Statics.BUBE) || this.farbe.equalsIgnoreCase(Statics.PIK);
-            case HERZ:
+            case Herz:
                 return this.value.equals(Statics.BUBE) || this.farbe.equalsIgnoreCase(Statics.HERZ);
-            case KARO:
+            case Karo:
                 return this.value.equals(Statics.BUBE) || this.farbe.equalsIgnoreCase(Statics.KARO);
-            case NULL:
+            case Null:
                 return false;
         }
         return false;
