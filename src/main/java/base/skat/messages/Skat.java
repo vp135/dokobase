@@ -10,8 +10,9 @@ import java.util.List;
 public class Skat extends RequestObject {
     public final static String COMMAND = "skat";
 
-    public Skat(List<BaseCard> skat) {
+    public Skat(String player, List<BaseCard> skat) {
         this.command = COMMAND;
+        this.params.addProperty("player",player);
         JsonArray array = new JsonArray();
         skat.forEach(p->array.add(p.toString()));
         params.add("cards",array);

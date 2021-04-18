@@ -5,8 +5,9 @@ import base.messages.RequestObject;
 public class GameSelected extends RequestObject {
     public final static String COMMAND = "gameSelected";
 
-    public GameSelected(GAMES game, boolean hand, boolean ouvert){
+    public GameSelected(String player, GAMES game, boolean hand, boolean ouvert){
         this.command = COMMAND;
+        this.params.addProperty("player", player);
         this.params.addProperty("game", game.name());
         this.params.addProperty("hand", hand);
         this.params.addProperty("ouvert", ouvert);

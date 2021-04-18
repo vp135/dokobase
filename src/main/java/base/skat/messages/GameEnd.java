@@ -1,8 +1,8 @@
-package base.messages;
+package base.skat.messages;
 
 import base.Player;
+import base.skat.Stich;
 import base.messages.RequestObject;
-import base.doko.Stich;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -27,12 +27,13 @@ public class GameEnd extends RequestObject {
         }
     }
 
-    public GameEnd(String re1, String re2, String kontra1, String kontra2, int remain){
+    public GameEnd(String re1, String kontra1, String player1, String player2, String player3, int remain){
         this.command = COMMAND;
         this.params.addProperty("re1",re1);
-        this.params.addProperty("re2",re2);
         this.params.addProperty("kontra1", kontra1);
-        this.params.addProperty("kontra2", kontra2);
+        this.params.addProperty("player1", player1);
+        this.params.addProperty("player2", player2);
+        this.params.addProperty("player3", player3);
         this.params.addProperty("remain", remain);
     }
 }
