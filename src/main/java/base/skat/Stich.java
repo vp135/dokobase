@@ -65,10 +65,9 @@ public class Stich {
                     case Null:
                         currentWinner = Compare.nullspiel(currentWinner,nextCard);
                         break;
+                    case Ramsch:
                     case Grand:
                         currentWinner = Compare.grand(currentWinner,nextCard);
-                        break;
-                    default:
                         break;
                 }
             }
