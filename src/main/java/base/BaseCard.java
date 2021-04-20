@@ -52,4 +52,8 @@ public abstract class BaseCard {
             Statics.KARO+Statics.DAME,
             Statics.KARO+Statics.KOENIG,
             Statics.KARO+Statics.ASS));
+
+    public String toTrimedString() {
+        return this.farbe+this.value;
+    }
 }

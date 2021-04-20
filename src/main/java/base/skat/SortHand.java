@@ -14,9 +14,8 @@ public class SortHand {
 
     public static List<BaseCard> sort(List<BaseCard> list, GameSelected.GAMES order){
         switch (order){
-            case Karo:{
+            case Karo:
                 return sortKaro(list);
-            }
             case Herz:
                 return sortHerz(list);
             case Pik:

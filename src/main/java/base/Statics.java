@@ -1,7 +1,5 @@
 package base;
 
-import base.skat.messages.GameSelected;
-
 public class Statics {
 
     public static final String KREUZ = "Kreuz";
@@ -18,9 +16,9 @@ public class Statics {
     public static final String ASS = "Ass";
 
     public enum game{
-        SKAT,
-        DOKO
+        DOKO,
+        SKAT
     }
 
-    public static final String VERSION = "3.3.0";
+    public static final String VERSION = "4.0.0";
 }

@@ -1,7 +1,6 @@
 package base.doko.messages;
 
 import base.BaseCard;
-import base.doko.Card;
 import base.messages.RequestObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

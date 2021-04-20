@@ -1,6 +1,5 @@
 package base.skat;
 
-import base.Logger;
 import base.Player;
 import base.Statics;
 import base.skat.messages.GameSelected;
@@ -10,8 +9,6 @@ import java.util.List;
 
 public class Stich {
 
-    private final static Logger log = new Logger("Stich",3, true);
-
     private final transient HashMap<Card, Integer> cardMap = new HashMap<>();
     private int points;
     private int winner;
@@ -19,7 +16,7 @@ public class Stich {
     private Card winningCard;
     private int summe;
     private final List<Player> players;
-    private GameSelected.GAMES gameType;
+    private final GameSelected.GAMES gameType;
 
 
     public Stich(List<Player> players, int stichnumber, GameSelected.GAMES gameType){
@@ -38,10 +35,6 @@ public class Stich {
         return cardMap;
     }
 
-    /*public int getWinner(){
-        return winner;
-    }
-    */
 
     public int getWinner() {
         Card currentWinner = cardMap.keySet().stream().filter(card -> card.order==0).findFirst().get();

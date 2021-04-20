@@ -1,6 +1,5 @@
 package base.skat.messages;
 
-import base.Player;
 import base.messages.RequestObject;
 
 public class Reizen extends RequestObject {

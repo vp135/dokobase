@@ -23,8 +23,8 @@ public class Stich {
     private int herzstich = 0;
     private Card winningCard;
     private int summe;
-    private final List<Player> players;
-    private String gameType;
+    private List<Player> players;
+    private final String gameType;
 
 
     public Stich(List<Player> players, int stichnumber, String gameType){
@@ -227,5 +227,9 @@ public class Stich {
                 .append(card.value)
                 .append("\n"));
         return s.toString();
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
     }
 }

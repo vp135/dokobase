@@ -6,8 +6,8 @@ import java.net.Socket;
 
 public class MessageOut {
 
-    private Socket socket;
-    private RequestObject output;
+    private final Socket socket;
+    private final RequestObject output;
 
     public MessageOut(java.net.Socket socket, RequestObject output) {
         this.socket = socket;

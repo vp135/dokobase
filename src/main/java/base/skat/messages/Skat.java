@@ -3,7 +3,6 @@ package base.skat.messages;
 import base.BaseCard;
 import base.messages.RequestObject;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import java.util.List;
 
