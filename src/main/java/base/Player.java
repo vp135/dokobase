@@ -8,7 +8,7 @@ public class Player {
     private final int number;
     private transient Socket socket;
     private boolean spectator;
-    private List<Card> hand;
+    private List<BaseCard> hand;
     private boolean re;
     private int points;
 
@@ -55,11 +55,11 @@ public class Player {
         this.spectator = spectator;
     }
 
-    public List<Card> getHand() {
+    public List<BaseCard> getHand() {
         return hand;
     }
 
-    public void setHand(List<Card> hand) {
+    public void setHand(List<BaseCard> hand) {
         this.hand = hand;
     }
 
@@ -100,7 +100,7 @@ public class Player {
     }
 
     public boolean hasCard(String farbe, String value){
-        for (Card card : hand) {
+        for (BaseCard card : hand) {
             if (card.farbe.equals(farbe) && card.value.equals(value)) {
                 return true;
             }

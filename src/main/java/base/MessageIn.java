@@ -3,8 +3,8 @@ package base;
 import java.net.Socket;
 
 public class MessageIn {
-    private Socket socket;
-    private String input;
+    private final Socket socket;
+    private final String input;
 
     public MessageIn(Socket socket, String input) {
         this.socket = socket;
