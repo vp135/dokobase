@@ -1,5 +1,6 @@
 package base.doko;
 
+import base.BaseCard;
 import base.Logger;
 import base.Player;
 import base.Statics;
@@ -40,6 +41,12 @@ public class Stich {
 
     public HashMap<Card, Integer> getCardMap() {
         return cardMap;
+    }
+
+    public HashMap<BaseCard,Integer> getBaseCardMap(){
+        HashMap<BaseCard, Integer> baseMap = new HashMap<>();
+        cardMap.keySet().forEach(key-> baseMap.put(key,cardMap.get(key)));
+        return baseMap;
     }
 
     public int getWinner(){

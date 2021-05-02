@@ -42,7 +42,7 @@ public class Card extends BaseCard {
 
 
     public static Card randomCard(List<Card> cards, Random r){
-        return cards.get(r.nextInt(40));
+        return cards.get(r.nextInt(32));
     }
 
 

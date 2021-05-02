@@ -1,11 +1,13 @@
 package base.skat;
 
+import base.BaseCard;
 import base.Player;
 import base.Statics;
 import base.skat.messages.GameSelected;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Stich {
 
@@ -33,6 +35,12 @@ public class Stich {
 
     public HashMap<Card, Integer> getCardMap() {
         return cardMap;
+    }
+
+    public HashMap<BaseCard,Integer> getBaseCardMap(){
+        HashMap<BaseCard, Integer> baseMap = new HashMap<>();
+        cardMap.keySet().forEach(key-> baseMap.put(key,cardMap.get(key)));
+        return baseMap;
     }
 
 
@@ -105,7 +113,9 @@ public class Stich {
         return points;
     }
 
-
+    public Card getWinningCard(){
+        return winningCard;
+    }
 
 
     @Override
@@ -120,4 +130,6 @@ public class Stich {
                 .append("\n"));
         return s.toString();
     }
+
+
 }
