@@ -6,7 +6,8 @@ public class Schieben extends RequestObject {
 
     public final static String COMMAND = "schieben";
 
-    public Schieben() {
+    public Schieben(String player) {
         this.command = COMMAND;
+        this.params.addProperty("player",player);
     }
 }
