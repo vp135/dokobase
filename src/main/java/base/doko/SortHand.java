@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 public class SortHand {
 
-    public static List<BaseCard> sort(List<BaseCard> list, String order, boolean schweinExists){
-        switch (order){
+    public static List<BaseCard> sort(List<BaseCard> list, String selectedGame, boolean schweinExists){
+        switch (selectedGame){
             case GameSelected.NORMAL:{
                 return sortNormal(list,schweinExists);
             }
