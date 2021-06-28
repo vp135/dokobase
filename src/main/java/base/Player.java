@@ -1,7 +1,11 @@
 package base;
 
+import base.messages.RequestObject;
+
 import java.net.Socket;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Player {
     private final String name;
@@ -12,23 +16,33 @@ public class Player {
     private boolean re;
     private int points;
 
+    private final ConcurrentLinkedDeque<RequestObject> outMessages = new ConcurrentLinkedDeque<>();
+    private final AutoResetEvent evOut = new AutoResetEvent(true);
+    private ComServer comServer;
+    public static final long TIMEOUT = 1000;
+
+
     private final Logger log = new Logger("Players",3,true);
 
 
-    public Player(String name, int number, Socket socket, boolean spectator, boolean re) {
+    public Player(String name, int number, Socket socket, boolean spectator, ComServer comServer, boolean re) {
         this.name = name;
         this.number = number;
         this.socket = socket;
         this.spectator = spectator;
         this.re = re;
+        this.comServer =comServer;
+        outMessageHandling();
     }
 
-    public Player(String name, int number, Socket socket, boolean spectator) {
+    public Player(String name, int number, Socket socket, boolean spectator, ComServer comServer) {
         this.name = name;
         this.number = number;
         this.socket = socket;
         this.spectator = spectator;
         this.re = false;
+        this.comServer = comServer;
+        outMessageHandling();
     }
 
     public String getName() {
@@ -106,5 +120,36 @@ public class Player {
             }
         }
         return false;
+    }
+
+    public ConcurrentLinkedDeque<RequestObject> getOutMessages() {
+        return outMessages;
+    }
+
+    public void queue(RequestObject message){
+        outMessages.add(message);
+        evOut.set();
+    }
+
+    public void outMessageHandling(){
+        new Thread(() -> {
+            while (true){
+                try {
+                    evOut.waitOne(TIMEOUT);
+                    while(outMessages.peek()!=null){
+                        if(comServer.sendReply(this.socket, outMessages.peek())) {
+                            outMessages.poll();
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public void removeCard(String farbe,String wert) {
+        hand.stream().filter(baseCard -> baseCard.farbe.equals(farbe) && baseCard.value.equals(wert)).findFirst()
+                .ifPresent(baseCard -> hand.remove(baseCard));
     }
 }
