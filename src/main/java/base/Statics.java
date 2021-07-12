@@ -20,5 +20,39 @@ public class Statics {
         SKAT
     }
 
-    public static final String VERSION = "4.0.0";
+    public static final String VERSION = "4.2.0";
+
+    public enum ADMINREQUESTS {
+        NOTHING(0),
+        SHUFFLE(1),
+        ACKNOWLEDGE(2),
+        END_CLIENTS(3);
+
+        public final int value;
+        ADMINREQUESTS(int value) {
+            this.value = value;
+        }
+
+        public static ADMINREQUESTS getName(int val){
+            for (ADMINREQUESTS request: ADMINREQUESTS.values()){
+                if(request.value==val){
+                    return request;
+                }
+            }
+            return NOTHING;
+        }
+    }
+
+    public enum SKAT_STATE {
+        REIZEN(0),
+        GRAND_HAND(1),
+        RAMSCH(2),
+        PLAY(3),
+        END(4);
+
+        private final int value;
+        SKAT_STATE(int value) {
+            this.value = value;
+        }
+    }
 }

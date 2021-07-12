@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'de.volker.dokobase'
-version '4.0.1'
+version '4.1.1'
 
 sourceCompatibility = 1.8
 

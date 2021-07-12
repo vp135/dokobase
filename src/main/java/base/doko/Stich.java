@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static base.doko.messages.GameSelected.GAMES.*;
+
 public class Stich {
 
     private final static Logger log = new Logger("Stich",3, true);
@@ -25,10 +27,10 @@ public class Stich {
     private Card winningCard;
     private int summe;
     private List<Player> players;
-    private final String gameType;
+    private final GameSelected.GAMES gameType;
 
 
-    public Stich(List<Player> players, int stichnumber, String gameType){
+    public Stich(List<Player> players, int stichnumber, GameSelected.GAMES gameType){
         this.players = players;
         this.stichnumber = stichnumber;
         this.gameType = gameType;
@@ -60,30 +62,30 @@ public class Stich {
                 int finalI = i;
                 Card nextCard = cardMap.keySet().stream().filter(card -> card.order== finalI).findFirst().get();
                 switch (gameType) {
-                    case GameSelected.NORMAL:
-                    case GameSelected.ARMUT:
-                    case GameSelected.KARO:
+                    case NORMAL:
+                    case ARMUT:
+                    case KARO:
                         currentWinner = Compare.normalGame(currentWinner, nextCard, schwein);
                         break;
-                    case GameSelected.DAMEN:
+                    case DAMEN:
                         currentWinner = Compare.damen(currentWinner, nextCard);
                         break;
-                    case GameSelected.BUBEN:
+                    case BUBEN:
                         currentWinner = Compare.buben(currentWinner, nextCard);
                         break;
-                    case GameSelected.BUBENDAMEN:
+                    case BUBENDAMEN:
                         currentWinner = Compare.bubendamen(currentWinner, nextCard);
                         break;
-                    case GameSelected.FLEISCHLOS:
+                    case FLEISCHLOS:
                         currentWinner = Compare.fleischlos(currentWinner, nextCard);
                         break;
-                    case GameSelected.KREUZ:
+                    case KREUZ:
                         currentWinner = Compare.kreuz(currentWinner, nextCard);
                         break;
-                    case GameSelected.PIK:
+                    case PIK:
                         currentWinner = Compare.pik(currentWinner, nextCard);
                         break;
-                    case GameSelected.HERZ:
+                    case HERZ:
                         currentWinner = Compare.herz(currentWinner, nextCard);
                         break;
                 }
@@ -163,27 +165,27 @@ public class Stich {
 
     public void check4ExtraPoints(){
         checkDoppelkopf();
-        if(gameType.equals(GameSelected.NORMAL)
-                ||gameType.equals(GameSelected.ARMUT)
-                ||gameType.equals(GameSelected.HOCHZEIT)
-                ||gameType.equals(GameSelected.HERZ)
-                ||gameType.equals(GameSelected.KARO)
-                ||gameType.equals(GameSelected.KREUZ)
-                ||gameType.equals(GameSelected.PIK)) {
+        if(gameType ==NORMAL
+                ||gameType.equals(ARMUT)
+                ||gameType.equals(HOCHZEIT)
+                ||gameType.equals(HERZ)
+                ||gameType.equals(KARO)
+                ||gameType.equals(KREUZ)
+                ||gameType.equals(PIK)) {
             checkKarlchen();
         }
-        if(gameType.equals(GameSelected.NORMAL)
-                ||gameType.equals(GameSelected.ARMUT)
-                ||gameType.equals(GameSelected.HOCHZEIT)
-                ||gameType.equals(GameSelected.KARO)
-                ||gameType.equals(GameSelected.KREUZ)
-                ||gameType.equals(GameSelected.PIK)) {
+        if(gameType.equals(NORMAL)
+                ||gameType.equals(ARMUT)
+                ||gameType.equals(HOCHZEIT)
+                ||gameType.equals(KARO)
+                ||gameType.equals(KREUZ)
+                ||gameType.equals(PIK)) {
             checkHerzStich();
         }
-        if(gameType.equals(GameSelected.NORMAL)
-                ||gameType.equals(GameSelected.ARMUT)
-                ||gameType.equals(GameSelected.HOCHZEIT)
-                ||gameType.equals(GameSelected.KARO)) {
+        if(gameType.equals(NORMAL)
+                ||gameType.equals(ARMUT)
+                ||gameType.equals(HOCHZEIT)
+                ||gameType.equals(KARO)) {
             checkFuchsGefangen();
         }
     }

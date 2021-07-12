@@ -1,5 +1,6 @@
-package base.messages;
+package base.messages.admin;
 
+import base.messages.RequestObject;
 import com.google.gson.JsonObject;
 
 public class AbortGame extends RequestObject {

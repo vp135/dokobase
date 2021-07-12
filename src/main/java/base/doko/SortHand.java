@@ -2,44 +2,45 @@ package base.doko;
 
 import base.BaseCard;
 import base.Statics;
-import base.doko.messages.GameSelected;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static base.doko.messages.GameSelected.GAMES;
+
 public class SortHand {
 
-    public static List<BaseCard> sort(List<BaseCard> list, String order, boolean schweinExists){
-        switch (order){
-            case GameSelected.NORMAL:{
+    public static List<BaseCard> sort(List<BaseCard> list, GAMES selectedGame, boolean schweinExists){
+        switch (selectedGame){
+            case NORMAL:{
                 return sortNormal(list,schweinExists);
             }
-            case GameSelected.DAMEN:{
+            case DAMEN:{
                 return sortDamenSolo(list);
             }
-            case GameSelected.BUBEN:{
+            case BUBEN:{
                 return sortBubenSolo(list);
             }
-            case GameSelected.BUBENDAMEN:{
+            case BUBENDAMEN:{
                 return sortBubenDamenSolo(list);
             }
-            case GameSelected.FLEISCHLOS:{
+            case FLEISCHLOS:{
                 return sortFleischlos(list);
             }
-            case GameSelected.ARMUT:{
+            case ARMUT:{
                 return sortArmut(list,schweinExists);
             }
-            case GameSelected.KREUZ:{
+            case KREUZ:{
                 return sortKreuz(list);
             }
-            case GameSelected.PIK:{
+            case PIK:{
                 return sortPik(list);
             }
-            case GameSelected.HERZ:{
+            case HERZ:{
                 return sortHerz(list);
             }
-            case GameSelected.KARO:{
+            case KARO:{
                 return sortKaro(list,schweinExists);
             }
             default:{
