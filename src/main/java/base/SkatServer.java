@@ -37,6 +37,7 @@ public class SkatServer extends BaseServer{
     private int gamesTilRamsch;
     private int gamesTilNormal;
     private Statics.SKAT_STATE state;
+    private Reizen lastReizen = null;
 
     public SkatServer(BaseServer server) {
         super(server.c, server.comServer);
@@ -186,6 +187,7 @@ public class SkatServer extends BaseServer{
     @Override
     public void endIt() {
         super.endIt();
+        state = END;
         SkatEndDialog e = new SkatEndDialog(selectedGame, players, stichList, skat);
         send2All(new GameEnd(e.getReString1(), e.getKontraString1(),
                 e.getPlayer1String(), e.getPlayer2String(), e.getPlayer3String(),
@@ -219,6 +221,9 @@ public class SkatServer extends BaseServer{
         }
         currentPlayer = player;
         currentStichNumber =0;
+        state = PLAY;
+        players.forEach(p->p.state = Player.PLAYER_STATE.PLAY_CARD);
+        lastReizen = null;
         send2All(new Wait4Player(players.stream().filter(p -> p.getNumber()==player).findAny().get().getName()));
     }
 
@@ -248,6 +253,7 @@ public class SkatServer extends BaseServer{
     }
 
     private void handleSkat(RequestObject message) {
+
         JsonArray array = message.getParams().getAsJsonArray("cards");
         Player player = players.stream().filter(p->p.getName().equals(
                 message.getParams().get("player").getAsString())).findFirst().get();
@@ -271,10 +277,12 @@ public class SkatServer extends BaseServer{
         if(nextRamschPlayer==hoeren){
             nextRamschPlayer= sagen;
             queueOut(players.get(nextRamschPlayer),new RamschSkat());
+            players.get(nextRamschPlayer).state = Player.PLAYER_STATE.SELECTING_CARDS_RAMSCH;
         }
         else if(nextRamschPlayer == sagen){
             nextRamschPlayer= weitersagen;
             queueOut(players.get(nextRamschPlayer),new RamschSkat());
+            players.get(nextRamschPlayer).state = Player.PLAYER_STATE.SELECTING_RAMSCH;
         }
         else{
             runGame(beginner);
@@ -305,6 +313,8 @@ public class SkatServer extends BaseServer{
         players.stream().filter(player -> player.getName().equals(message.getParams()
                 .get("player").getAsString())).findFirst().get().getHand().addAll(skat);
         skat.clear();
+        players.stream().filter(player -> player.getName().equals(message.getParams()
+                .get("player").getAsString())).findFirst().get().state = Player.PLAYER_STATE.SELECTING_CARDS_GAME;
     }
 
     private void handlePassen(RequestObject message) {
@@ -366,7 +376,7 @@ public class SkatServer extends BaseServer{
     }
 
     private void askNext(int playerNumber) {
-        queueOut(players.get(playerNumber),new Reizen(
+        queueOut(players.get(playerNumber),lastReizen = new Reizen(
                 players.get(playerNumber).getName(),
                 currentGameValue,
                 true));
@@ -386,12 +396,12 @@ public class SkatServer extends BaseServer{
                 if (p == hoeren) {
                     selectGame(hoeren);
                 } else if (p == sagen) {
-                    queueOut(players.get(hoeren), new Reizen(players.get(hoeren).getName(), currentGameValue, false));
+                    queueOut(players.get(hoeren), lastReizen = new Reizen(players.get(hoeren).getName(), currentGameValue, false));
                 } else if (p == weitersagen) {
                     if (sagen < 0) {
-                        queueOut(players.get(hoeren), new Reizen(players.get(hoeren).getName(), currentGameValue, false));
+                        queueOut(players.get(hoeren), lastReizen = new Reizen(players.get(hoeren).getName(), currentGameValue, false));
                     } else if (hoeren < 0) {
-                        queueOut(players.get(sagen), new Reizen(players.get(sagen).getName(), currentGameValue, false));
+                        queueOut(players.get(sagen), lastReizen = new Reizen(players.get(sagen).getName(), currentGameValue, false));
                     }
                 }
             } else {
@@ -401,13 +411,13 @@ public class SkatServer extends BaseServer{
                                 "Ja")));
                 if (p == hoeren) {
                     if(sagen<0){
-                        queueOut(players.get(weitersagen), new Reizen(players.get(weitersagen).getName(), currentGameValue, true));
+                        queueOut(players.get(weitersagen), lastReizen = new Reizen(players.get(weitersagen).getName(), currentGameValue, true));
                     }
                     else{
-                        queueOut(players.get(sagen), new Reizen(players.get(sagen).getName(), currentGameValue, true));
+                        queueOut(players.get(sagen), lastReizen = new Reizen(players.get(sagen).getName(), currentGameValue, true));
                     }
                 } else if (p == sagen) {
-                    queueOut(players.get(weitersagen), new Reizen(players.get(weitersagen).getName(), currentGameValue, true));
+                    queueOut(players.get(weitersagen), lastReizen = new Reizen(players.get(weitersagen).getName(), currentGameValue, true));
                 }
             }
         }
@@ -453,7 +463,7 @@ public class SkatServer extends BaseServer{
             setPlayerRoles();
 
             if(gamesTilNormal<1){
-                queueOut(players.get(sagen),new Reizen(players.get(sagen).getName(),currentGameValue,true));
+                queueOut(players.get(sagen),lastReizen = new Reizen(players.get(sagen).getName(),currentGameValue,true));
             }
             else if(gamesTilRamsch<1){
                 nextRamschPlayer = hoeren;
@@ -547,13 +557,24 @@ public class SkatServer extends BaseServer{
                 player.queue(new PutCard(stich.getBaseCardMap().get(baseCard), baseCard.farbe, baseCard.value));
             });
         }
-        if(wait4NextRound){
-            readyMap.put(player.getNumber(),true);
+        switch (state){
+            case REIZEN:
+                if(lastReizen.getPlayer().equals(player.getName())){
+                    queueOut(player, lastReizen);
+                }
+                player.queue(new DisplayMessage(lastReizen.getPlayer() +": " + lastReizen.getValue()));
+                break;
+            case GRAND_HAND:
+                break;
+            case RAMSCH:
+                queueOut(players.get(nextRamschPlayer),new RamschSkat());
+                break;
+            case PLAY:
+                player.queue(new Wait4Player(players.get(currentPlayer).getName()));
+                break;
+            case END:
+                readyMap.put(player.getNumber(),true);
+                break;
         }
-        else{
-            player.queue(new Wait4Player(players.get(currentPlayer).getName()));
-        }
-
     }
-
 }

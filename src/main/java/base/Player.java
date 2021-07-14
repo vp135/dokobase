@@ -4,7 +4,6 @@ import base.messages.RequestObject;
 
 import java.net.Socket;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Player {
@@ -15,6 +14,7 @@ public class Player {
     private List<BaseCard> hand;
     private boolean re;
     private int points;
+    public PLAYER_STATE state = PLAYER_STATE.IDLE;
 
     private final ConcurrentLinkedDeque<RequestObject> outMessages = new ConcurrentLinkedDeque<>();
     private final AutoResetEvent evOut = new AutoResetEvent(true);
@@ -24,6 +24,22 @@ public class Player {
 
     private final Logger log = new Logger("Players",3,true);
 
+
+    public enum PLAYER_STATE {
+        IDLE(0),
+        SELECTING_GAME(1),
+        SELECTING_CARDS_GAME(2),
+        SELECTING_RAMSCH(3),
+        SELECTING_CARDS_RAMSCH(4),
+        SELECTING_ARMUT(5),
+        PLAY_CARD(6),
+        END(7);
+
+        private final int value;
+        PLAYER_STATE(int value) {
+            this.value = value;
+        }
+    }
 
     public Player(String name, int number, Socket socket, boolean spectator, ComServer comServer, boolean re) {
         this.name = name;
