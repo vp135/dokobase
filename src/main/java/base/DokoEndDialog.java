@@ -8,6 +8,7 @@ import java.util.List;
 
 public class DokoEndDialog {
 
+    private IDialogInterface client;
     private JPanel panel;
     private JButton buttonOK;
 
@@ -98,13 +99,14 @@ public class DokoEndDialog {
         return remaining;
     }
 
-    public DokoEndDialog(String re1, String re2, String kontra1, String kontra2, int remaining) {
+    public DokoEndDialog(IDialogInterface client, String re1, String re2, String kontra1, String kontra2, int remaining) {
 
         this.reString1 = re1;
         this.reString2 = re2;
         this.kontraString1 = kontra1;
         this.kontraString2 = kontra2;
         this.remaining = remaining;
+        this.client = client;
         createPanel();
     }
 
@@ -152,7 +154,10 @@ public class DokoEndDialog {
         if(panel!=null) {
 
             dialog = new JDialog(frame);
-            buttonOK.addActionListener(e -> dialog.dispose());
+            buttonOK.addActionListener(e ->{
+                dialog.dispose();
+                client.quitEnd();
+            });
             dialog.setModal(false);
             dialog.setTitle("Ergebnis");
             dialog.getContentPane().add(panel);
@@ -164,5 +169,6 @@ public class DokoEndDialog {
 
     public void ackowledge() {
         dialog.dispose();
+        client.quitEnd();
     }
 }

@@ -91,6 +91,8 @@ public class DokoServer extends BaseServer{
             case ReadyForNextRound.COMMAND:{
                 if(wait4NextRound){
                     readyMap.put(requestObject.getParams().get("player").getAsInt(),true);
+                    players.stream().filter(Player::isAdmin).forEach(p->p.queue(new DisplayMessage(
+                            players.get(requestObject.getParams().get("player").getAsInt()).getName()+ " ist bereit")));
                 }
                 if(readyMap.values().stream().allMatch(p-> p)){
                     nextGame();
@@ -466,6 +468,16 @@ public class DokoServer extends BaseServer{
     @Override
     public void startGame() {
         super.startGame();
+        if(players.size()>4) {
+            if (beginner == 0) {
+                spectator = 4;
+            } else {
+                spectator = beginner - 1;
+            }
+        }
+        if(players.size()>4) {
+            players.get(spectator).setSpectator(true);
+        }
         send2All(new AnnounceSpectator(spectator,beginner));
         shuffleCards();
     }
@@ -496,11 +508,13 @@ public class DokoServer extends BaseServer{
         }
         else if(wait4NextRound){
             readyMap.put(player.getNumber(),true);
+            players.stream().filter(Player::isAdmin).forEach(p->
+                    p.queue(new DisplayMessage(player.getName()+ " ist bereit")));
         }
         else {
             player.queue(new Wait4Player(players.get(currentPlayer).getName()));
         }
-
+        super.updateReconnectedPlayer(player);
     }
 
     public Stich getStich(int stichNumber) {

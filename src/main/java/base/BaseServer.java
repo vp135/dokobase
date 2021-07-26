@@ -58,8 +58,10 @@ public class BaseServer implements IServerMessageHandler{
         }
         send2All(new StartGame(gameType.name()));
         players.stream().filter(player -> player.getName().equals(adminName))
-                .collect(Collectors.toList()).forEach(player -> queueOut(player,new SetAdmin(true)));
-        //DisplayMessageQueues();
+                .collect(Collectors.toList()).forEach(player ->{
+            queueOut(player,new SetAdmin(true));
+            player.setAdmin(true);
+        });
     }
 
     protected void endIt(){
@@ -123,7 +125,7 @@ public class BaseServer implements IServerMessageHandler{
     }
 
     protected void updateReconnectedPlayer(Player player) {
-
+        player.queue(new SetAdmin(player.isAdmin()));
     }
 
     private void handleAdminRequest(RequestObject requestObject) {
@@ -157,4 +159,6 @@ public class BaseServer implements IServerMessageHandler{
     public void setStartPlayer(int selectedIndex) {
         beginner = selectedIndex;
     }
+
+
 }

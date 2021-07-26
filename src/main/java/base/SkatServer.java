@@ -576,5 +576,8 @@ public class SkatServer extends BaseServer{
                 readyMap.put(player.getNumber(),true);
                 break;
         }
+        super.updateReconnectedPlayer(player);
     }
+
+
 }
