@@ -12,6 +12,7 @@ import java.util.List;
 
 public class SkatEndDialog {
 
+    private IDialogInterface client;
     private JPanel panel;
     private JButton buttonOK;
 
@@ -26,6 +27,7 @@ public class SkatEndDialog {
     private String player3String;
     private int remaining = 120;
     private final GameSelected.GAMES game;
+    private JDialog d;
 
     public SkatEndDialog(GameSelected.GAMES game, List<Player> players, List<Stich> stichList, List<BaseCard> skat){
         this.game = game;
@@ -125,6 +127,7 @@ public class SkatEndDialog {
         }
     }
 
+
     public String getPlayer1String() {
         return player1String;
     }
@@ -149,10 +152,10 @@ public class SkatEndDialog {
         return remaining;
     }
 
-    public SkatEndDialog(GameSelected.GAMES game, String re1, String kontra1,
+    public SkatEndDialog(IDialogInterface client, GameSelected.GAMES game, String re1, String kontra1,
                          String player1String, String player2String, String player3String,
                          int remaining) {
-
+        this.client = client;
         this.game = game;
         this.reString1 = re1;
         this.kontraString1 = kontra1;
@@ -208,8 +211,11 @@ public class SkatEndDialog {
 
     public void showDialog(JFrame frame){
         if(panel!=null) {
-            JDialog d = new JDialog(frame);
-            buttonOK.addActionListener(e -> d.dispose());
+            d = new JDialog(frame);
+            buttonOK.addActionListener(e ->{
+                d.dispose();
+                client.quitEnd();
+            });
             d.setModal(true);
             d.setTitle("Ergebnis - " + game.name());
             d.getContentPane().add(panel);
@@ -246,5 +252,9 @@ public class SkatEndDialog {
             }
         }
         return result;
+    }
+
+    public void ackowledge() {
+        d.dispose();
     }
 }

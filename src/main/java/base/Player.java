@@ -14,6 +14,7 @@ public class Player {
     private List<BaseCard> hand;
     private boolean re;
     private int points;
+    private boolean admin;
     public PLAYER_STATE state = PLAYER_STATE.IDLE;
 
     private final ConcurrentLinkedDeque<RequestObject> outMessages = new ConcurrentLinkedDeque<>();
@@ -23,6 +24,14 @@ public class Player {
 
 
     private final Logger log = new Logger("Players",3,true);
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
 
 
     public enum PLAYER_STATE {
