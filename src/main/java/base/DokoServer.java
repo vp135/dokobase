@@ -34,7 +34,6 @@ public class DokoServer extends BaseServer{
     private HashMap<Integer,Boolean> readyMap;
     private HashMap<Integer,Integer> points;
     private HashMap<Integer, GameSelected.GAMES> gameSelection = new HashMap<>();
-    private DokoEndDialog endDialog;
 
     private int currentPlayer = 0;
     private GameSelected.GAMES selectedGame = NORMAL;
@@ -52,6 +51,7 @@ public class DokoServer extends BaseServer{
 
     public DokoServer(BaseServer server){
         super(server.c, server.comServer);
+        this.beginner = server.beginner;
         server.comServer.setServer(this);
         this.players.addAll(server.players);
         gameType = Statics.game.DOKO;
@@ -101,9 +101,13 @@ public class DokoServer extends BaseServer{
             }
             case GameSelected.COMMAND:{
                 if(wait4Gesund) {
-                    gameSelection.put(
-                            requestObject.getParams().get("player").getAsInt(),
-                            GameSelected.GAMES.getName(requestObject.getParams().get("game").getAsInt()));
+                    GameSelected.GAMES game = GameSelected.GAMES.getName(requestObject.getParams().get("game").getAsInt());
+                    gameSelection.put(requestObject.getParams().get("player").getAsInt(), game);
+                    if(game==KOENIGE){
+                        send2All(new DisplayMessage(
+                                Strings.getString(Strings.KOENIGE,
+                                players.get(requestObject.getParams().get("player").getAsInt()).getName())));
+                    }
                 }
                 if(gameSelection.keySet().size()>3){
                     setGameToPlay(gameSelection);
@@ -145,12 +149,12 @@ public class DokoServer extends BaseServer{
                     players.get(requestObject.getParams().get("player").getAsInt()).setRe(true, "ist arm");
                     players.stream().filter(player -> player.getNumber()!=requestObject.getParams().get("player").getAsInt())
                             .collect(Collectors.toList()).forEach(player -> queueOut(player,new DisplayMessage(
-                            players.get(requestObject.getParams().get("player").getAsInt()).getName() + " nimmt die Armut auf"
-                    )));
+                                    Strings.getString(Strings.ARMUT_ACCEPT,
+                                            players.get(requestObject.getParams().get("player").getAsInt()).getName()))));
                 }else{
                     send2All(new DisplayMessage(
-                            players.get(requestObject.getParams().get("player").getAsInt()).getName()
-                                    + " lehnt die Armut ab"));
+                            Strings.getString(Strings.ARMUT_REFUSE,
+                            players.get(requestObject.getParams().get("player").getAsInt()).getName())));
                     askNextPlayer2GetArmut();
                 }
                 break;
@@ -252,8 +256,8 @@ public class DokoServer extends BaseServer{
     @Override
     public void endIt() {
         super.endIt();
-        endDialog = new DokoEndDialog(players,stichList);
-        send2All(new GameEnd(endDialog.getReString1(),endDialog.getReString2(),endDialog.getKontraString1(),endDialog.getKontraString2(),endDialog.getRemaining()));
+        DokoEndDialog endDialog = new DokoEndDialog(players, stichList);
+        send2All(new GameEnd(endDialog.getReString1(), endDialog.getReString2(), endDialog.getKontraString1(), endDialog.getKontraString2(), endDialog.getRemaining()));
         wait4NextRound= true;
         readyMap = new HashMap<>();
         for (int i=0;i<players.size();i++){
@@ -295,8 +299,8 @@ public class DokoServer extends BaseServer{
             if(players.size()>4) {
                 players.get(spectator).setSpectator(true);
             }
-            send2All(new AnnounceSpectator(spectator,beginner));
         }
+        send2All(new AnnounceSpectator(spectator,beginner));
         shuffleCards();
     }
 
@@ -327,7 +331,7 @@ public class DokoServer extends BaseServer{
             players2Ask.remove(0);
         }
         else{
-            send2All(new DisplayMessage("Armut wurde nicht mitgenommen, es wird neu ausgeteilt"));
+            send2All(new DisplayMessage(Strings.getString(Strings.NEU_GEBEN)));
             shuffleCards();
         }
 
@@ -355,7 +359,7 @@ public class DokoServer extends BaseServer{
                 }
             }
             int finalIndex = index;
-            send2All(new DisplayMessage("Es wird neu gegeben. "+ players.get(finalIndex).getName()+ " hat zuviele Koenige."));
+            send2All(new DisplayMessage(Strings.getString(Strings.KOENIGE, players.get(finalIndex).getName())));
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -384,7 +388,13 @@ public class DokoServer extends BaseServer{
                         ||selection.get(checkPlayer).equals(KARO))){
                     selectedGame = selection.get(checkPlayer);
                     aufspieler = checkPlayer;
-                    send2All(new DisplayMessage(players.get(aufspieler).getName()+ " spielt "+selectedGame+"."));
+                    send2All(new AnnounceSpectator(spectator,aufspieler));
+                    send2All(new UpdateUserPanel(players.get(beginner).getName(),""));
+                    send2All(new UpdateUserPanel(players.get(aufspieler).getName(),""));
+                    send2All(new DisplayMessage(
+                            Strings.getString(
+                            Strings.SOLO, players.get(aufspieler).getName(),
+                            Strings.getGameName(selectedGame))));
                     players.get(aufspieler).setRe(true, "spielt Solo");
                     runGame(aufspieler);
                     return;
@@ -405,12 +415,14 @@ public class DokoServer extends BaseServer{
                     selectedGame = ARMUT;
                 }
             }
-
             int finalIndex = index;
             armutplayer = finalIndex;
             createListOfPotentialPartners();
-            send2All(new DisplayMessage(players.get(finalIndex).getName()+ " hat nur "+
-                    players.get(finalIndex).getHand().stream().filter(card -> card.trumpf).count() +" Trumpf."));
+            send2All(new DisplayMessage(
+                    Strings.getString(
+                            Strings.ARMUT_GIVE,
+                            players.get(armutplayer).getName(),
+                            players.get(armutplayer).getHand().stream().filter(card->card.trumpf).count())));
             queueOut(players.stream().filter(p -> p.getNumber()==finalIndex).findAny().get(),
                     new SelectCards4Armut());
         }
@@ -420,7 +432,7 @@ public class DokoServer extends BaseServer{
             for(Integer i :selection.keySet()) {
                 if(selection.get(i).equals(HOCHZEIT)){
                     players.get(i).setRe(true, "möchte heiraten");
-                    send2All(new DisplayMessage(players.get(i).getName() + " möchte heiraten"));
+                    send2All(new DisplayMessage(Strings.getString(Strings.HOCHZEIT,players.get(i).getName())));
                     hochzeitSpieler = i;
                     break;
                 }
@@ -474,8 +486,6 @@ public class DokoServer extends BaseServer{
             } else {
                 spectator = beginner - 1;
             }
-        }
-        if(players.size()>4) {
             players.get(spectator).setSpectator(true);
         }
         send2All(new AnnounceSpectator(spectator,beginner));

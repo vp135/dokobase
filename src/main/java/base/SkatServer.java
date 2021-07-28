@@ -41,6 +41,7 @@ public class SkatServer extends BaseServer{
 
     public SkatServer(BaseServer server) {
         super(server.c, server.comServer);
+        this.beginner = server.beginner;
         server.comServer.setServer(this);
         this.players.addAll(server.players);
         gameType = Statics.game.SKAT;

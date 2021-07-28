@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static base.Statics.ADMINREQUESTS.SHUFFLE;
-
 public class BaseServer implements IServerMessageHandler{
 
     protected Logger log = new Logger("Server",4);
@@ -18,7 +16,6 @@ public class BaseServer implements IServerMessageHandler{
     public ComServer comServer;
     protected final List<Player> players = new ArrayList<>();
     protected Configuration c;
-    protected int gamesPlayed = 0 ;
     protected String adminName;
     protected boolean gameRunning = false;
     protected int beginner=-1;

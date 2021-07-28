@@ -1,5 +1,7 @@
 package base;
 
+import base.doko.messages.GameSelected;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +15,7 @@ public class Strings {
     ));
 
     public final static List<String> SOLO = new ArrayList<>(Arrays.asList(
-            "%s spielt ein %ssolo"
+            "%s spielt ein %s"
     ));
 
     public final static List<String> ARMUT_GIVE = new ArrayList<>(Arrays.asList(
@@ -27,13 +29,11 @@ public class Strings {
 
     public final static List<String> ARMUT_REFUSE = new ArrayList<>(Arrays.asList(
             "%s lehnt die Armut ab",
-            "%s nimmt die Armut nicht mit",
-            "%s mag arme Menschen nicht"
+            "%s nimmt die Armut nicht mit"
     ));
 
     public final static List<String> ARMUT_ACCEPT = new ArrayList<>(Arrays.asList(
-            "%s nimmt die Armut auf",
-            "%s ist reich"
+            "%s nimmt die Armut auf"
     ));
 
     public final static List<String> ARMUT_RETURN = new ArrayList<>(Arrays.asList(
@@ -48,7 +48,34 @@ public class Strings {
             "Karten werden neu verteilt"
     ));
 
+    public static final List<String> HOCHZEIT = new ArrayList<>(Arrays.asList(
+            "%s möchte heiraten",
+            "%s will Hochzeit feiern"
+    ));
 
+
+    public static String getGameName(GameSelected.GAMES game){
+        switch (game){
+            case BUBEN:
+                return "Bubensolo";
+            case DAMEN:
+                return "Damensolo";
+            case BUBENDAMEN:
+                return "Buben-Damensolo";
+            case FLEISCHLOS:
+                return "Fleischlos";
+            case KREUZ:
+                return "Kreuzsolo";
+            case PIK:
+                return "Piksolo";
+            case HERZ:
+                return "Herzsolo";
+            case KARO:
+                return "Karosolo";
+            default:
+                return "";
+        }
+    }
 
     public static String getString(List<String> list, Object... args ){
         Random r = new Random(System.currentTimeMillis());
