@@ -55,6 +55,7 @@ public class DokoServer extends BaseServer{
         server.comServer.setServer(this);
         this.players.addAll(server.players);
         gameType = Statics.game.DOKO;
+        c.lastGame = gameType.name();
         gameRunning = true;
     }
 

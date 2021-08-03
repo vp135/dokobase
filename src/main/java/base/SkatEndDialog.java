@@ -216,7 +216,6 @@ public class SkatEndDialog {
                 d.dispose();
                 client.quitEnd();
             });
-            d.setModal(true);
             d.setTitle("Ergebnis - " + game.name());
             d.getContentPane().add(panel);
             d.pack();

@@ -45,6 +45,7 @@ public class SkatServer extends BaseServer{
         server.comServer.setServer(this);
         this.players.addAll(server.players);
         gameType = Statics.game.SKAT;
+        c.lastGame = gameType.name();
         gameRunning = true;
     }
 

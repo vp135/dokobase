@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 public class DokoConfig {
 
-    public HashMap<String,Boolean> sonderpunkte;
     public HashMap<String,Object>  regeln;
+    public HashMap<String,Boolean> sonderpunkte;
 
 
     public DokoConfig() {
