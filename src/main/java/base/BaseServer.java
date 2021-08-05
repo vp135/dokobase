@@ -3,6 +3,7 @@ package base;
 import base.messages.*;
 import base.messages.admin.AbortGame;
 import base.messages.admin.SetAdmin;
+import com.google.gson.JsonArray;
 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -106,6 +107,18 @@ public class BaseServer implements IServerMessageHandler{
 
                     });
                 }
+                break;
+            case ChangePlayerOrder.COMMAND:
+                List<Player> pList = new ArrayList<>();
+                List<String> sList = new ArrayList<>();
+                JsonArray pArray = requestObject.getParams().get("players").getAsJsonArray();
+                pArray.forEach(j-> {
+                    pList.add(players.stream().filter(p->p.getName().equals(j.getAsString())).findFirst().get());
+                    sList.add(j.getAsString());
+                });
+                players.clear();
+                players.addAll(pList);
+                send2All(new PlayersInLobby(sList));
                 break;
             case AbortGame.COMMAND:{
                 endIt();

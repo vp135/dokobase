@@ -18,7 +18,7 @@ public class Configuration {
     public UIConfig ui = new UIConfig();
     public SkatConfig skat = new SkatConfig();
     public DokoConfig doko = new DokoConfig();
-    public String lastGame;
+    public String lastGame = Statics.game.DOKO.name();
     public int logLevel=1;
 
 

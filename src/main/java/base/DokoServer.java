@@ -194,7 +194,7 @@ public class DokoServer extends BaseServer{
     private void
     handlePutCard(RequestObject requestObject) {
         if (stich == null || stich.getCardMap().size() > 3) {
-            stich = new Stich(players, currentStichNumber, selectedGame);
+            stich = new Stich(players, currentStichNumber, selectedGame,c.doko);
             currentStichNumber++;
         }
         stich.addCard(players.get(currentPlayer),new Card(

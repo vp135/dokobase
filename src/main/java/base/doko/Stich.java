@@ -1,15 +1,13 @@
 package base.doko;
 
-import base.BaseCard;
-import base.Logger;
-import base.Player;
-import base.Statics;
+import base.*;
 import base.doko.messages.GameSelected;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static base.DokoConfig.*;
 import static base.doko.messages.GameSelected.GAMES.*;
 
 public class Stich {
@@ -28,12 +26,14 @@ public class Stich {
     private int summe;
     private List<Player> players;
     private final GameSelected.GAMES gameType;
+    private final DokoConfig config;
 
 
-    public Stich(List<Player> players, int stichnumber, GameSelected.GAMES gameType){
+    public Stich(List<Player> players, int stichnumber, GameSelected.GAMES gameType, DokoConfig config){
         this.players = players;
         this.stichnumber = stichnumber;
         this.gameType = gameType;
+        this.config = config;
     }
 
     public void addCard(Player player, Card card){
@@ -156,7 +156,7 @@ public class Stich {
             builder.append("Fuchs gefangen(").append(fuchsGefangen).append(")");
         }
         if(builder.length()>0){
-            return "("+builder.toString()+")";
+            return "("+ builder +")";
         }
         else {
             return "";
@@ -192,33 +192,41 @@ public class Stich {
 
     private void checkFuchsGefangen() {
         fuchsGefangen = 0;
-        cardMap.keySet().stream().filter(card -> (card.farbe.equals(Statics.KARO) && card.value.equals(Statics.ASS)))
-                .collect(Collectors.toList()).forEach(card -> {
-            if (players.get(cardMap.get(card)).isRe() != players.get(winner).isRe()) {
-                fuchsGefangen++;
-                log.info("Fuchs gefangen");
-            }
-        });
+        if(config.sonderpunkte.get(FUCHS)) {
+            cardMap.keySet().stream().filter(card -> (card.farbe.equals(Statics.KARO) && card.value.equals(Statics.ASS)))
+                    .collect(Collectors.toList()).forEach(card -> {
+                        if (players.get(cardMap.get(card)).isRe() != players.get(winner).isRe()) {
+                            fuchsGefangen++;
+                            log.info("Fuchs gefangen");
+                        }
+                    });
+        }
     }
 
     private void checkHerzStich() {
-        if(winningCard.farbe.equals(Statics.HERZ) && !winningCard.trumpf){
-            herzstich = 1;
+        if(config.sonderpunkte.get(HERZSTICH)) {
+            if (winningCard.farbe.equals(Statics.HERZ) && !winningCard.trumpf) {
+                herzstich = 1;
+            }
         }
     }
 
     private void checkDoppelkopf() {
-        if(summe>39){
-            doppelkopf = 1;
-            log.info("Doppelkopf");
+        if(config.sonderpunkte.get(DOPPELKOPF)) {
+            if (summe > 39) {
+                doppelkopf = 1;
+                log.info("Doppelkopf");
+            }
         }
     }
 
     private void checkKarlchen() {
-        if(stichnumber==9){
-            if(winningCard.farbe.equals(Statics.KREUZ) && winningCard.value.equals(Statics.BUBE)){
-                karlchen = 1;
-                log.info("Karlchen");
+        if(config.sonderpunkte.get(KARLCHEN)) {
+            if (stichnumber == 9) {
+                if (winningCard.farbe.equals(Statics.KREUZ) && winningCard.value.equals(Statics.BUBE)) {
+                    karlchen = 1;
+                    log.info("Karlchen");
+                }
             }
         }
     }
