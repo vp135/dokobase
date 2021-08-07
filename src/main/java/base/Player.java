@@ -1,6 +1,6 @@
 package base;
 
-import base.messages.RequestObject;
+import base.messages.Message;
 
 import java.net.Socket;
 import java.util.List;
@@ -17,7 +17,7 @@ public class Player {
     private boolean admin;
     public PLAYER_STATE state = PLAYER_STATE.IDLE;
 
-    private final ConcurrentLinkedDeque<RequestObject> outMessages = new ConcurrentLinkedDeque<>();
+    private final ConcurrentLinkedDeque<Message> outMessages = new ConcurrentLinkedDeque<>();
     private final AutoResetEvent evOut = new AutoResetEvent(true);
     private ComServer comServer;
     public static final long TIMEOUT = 1000;
@@ -140,18 +140,18 @@ public class Player {
 
     public boolean hasCard(String farbe, String value){
         for (BaseCard card : hand) {
-            if (card.farbe.equals(farbe) && card.value.equals(value)) {
+            if (card.suit.equals(farbe) && card.kind.equals(value)) {
                 return true;
             }
         }
         return false;
     }
 
-    public ConcurrentLinkedDeque<RequestObject> getOutMessages() {
+    public ConcurrentLinkedDeque<Message> getOutMessages() {
         return outMessages;
     }
 
-    public void queue(RequestObject message){
+    public void queue(Message message){
         outMessages.add(message);
         evOut.set();
     }
@@ -174,7 +174,11 @@ public class Player {
     }
 
     public void removeCard(String farbe,String wert) {
-        hand.stream().filter(baseCard -> baseCard.farbe.equals(farbe) && baseCard.value.equals(wert)).findFirst()
+        hand.stream().filter(baseCard -> baseCard.suit.equals(farbe) && baseCard.kind.equals(wert)).findFirst()
                 .ifPresent(baseCard -> hand.remove(baseCard));
+    }
+
+    public void removeCard(BaseCard card){
+        removeCard(card.suit,card.kind);
     }
 }

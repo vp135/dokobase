@@ -1,20 +1,20 @@
 package base.doko;
 
 import base.*;
-import base.doko.messages.GameSelected;
+import base.doko.messages.MessageGameSelected;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static base.DokoConfig.*;
-import static base.doko.messages.GameSelected.GAMES.*;
+import static base.doko.messages.MessageGameSelected.GAMES.*;
 
 public class Stich {
 
     private final static Logger log = new Logger("Stich",3, true);
 
-    private final transient HashMap<Card, Integer> cardMap = new HashMap<>();
+    private final transient HashMap<BaseCard, Integer> cardMap = new HashMap<>();
     private int points;
     private int winner;
     private final int stichnumber;
@@ -22,33 +22,27 @@ public class Stich {
     private int karlchen = 0;
     private int fuchsGefangen = 0;
     private int herzstich = 0;
-    private Card winningCard;
+    private BaseCard winningCard;
     private int summe;
     private List<Player> players;
-    private final GameSelected.GAMES gameType;
+    private final MessageGameSelected.GAMES gameType;
     private final DokoConfig config;
 
 
-    public Stich(List<Player> players, int stichnumber, GameSelected.GAMES gameType, DokoConfig config){
+    public Stich(List<Player> players, int stichnumber, MessageGameSelected.GAMES gameType, DokoConfig config){
         this.players = players;
         this.stichnumber = stichnumber;
         this.gameType = gameType;
         this.config = config;
     }
 
-    public void addCard(Player player, Card card){
+    public void addCard(Player player, BaseCard card){
         card.order= cardMap.size();
         cardMap.put(card, player.getNumber());
     }
 
-    public HashMap<Card, Integer> getCardMap() {
+    public HashMap<BaseCard, Integer> getCardMap() {
         return cardMap;
-    }
-
-    public HashMap<BaseCard,Integer> getBaseCardMap(){
-        HashMap<BaseCard, Integer> baseMap = new HashMap<>();
-        cardMap.keySet().forEach(key-> baseMap.put(key,cardMap.get(key)));
-        return baseMap;
     }
 
     public int getWinner(){
@@ -56,11 +50,11 @@ public class Stich {
     }
 
     public int getWinner(boolean schwein) {
-        Card currentWinner = cardMap.keySet().stream().filter(card -> card.order==0).findFirst().get();
+        BaseCard currentWinner = cardMap.keySet().stream().filter(card -> card.order==0).findFirst().get();
         if(cardMap.size()==4){
             for(int i = 1; i<cardMap.size();i++){
                 int finalI = i;
-                Card nextCard = cardMap.keySet().stream().filter(card -> card.order== finalI).findFirst().get();
+                BaseCard nextCard = cardMap.keySet().stream().filter(card -> card.order== finalI).findFirst().get();
                 switch (gameType) {
                     case NORMAL:
                     case ARMUT:
@@ -100,8 +94,8 @@ public class Stich {
 
     public int calculatePoints(){
         int result=0;
-        for (Card card:this.cardMap.keySet()){
-            switch (card.value){
+        for (BaseCard card:this.cardMap.keySet()){
+            switch (card.kind){
                 case Statics.ZEHN:{
                     result+=10;
                     break;
@@ -193,7 +187,7 @@ public class Stich {
     private void checkFuchsGefangen() {
         fuchsGefangen = 0;
         if(config.sonderpunkte.get(FUCHS)) {
-            cardMap.keySet().stream().filter(card -> (card.farbe.equals(Statics.KARO) && card.value.equals(Statics.ASS)))
+            cardMap.keySet().stream().filter(card -> (card.suit.equals(Statics.KARO) && card.kind.equals(Statics.ASS)))
                     .collect(Collectors.toList()).forEach(card -> {
                         if (players.get(cardMap.get(card)).isRe() != players.get(winner).isRe()) {
                             fuchsGefangen++;
@@ -205,7 +199,7 @@ public class Stich {
 
     private void checkHerzStich() {
         if(config.sonderpunkte.get(HERZSTICH)) {
-            if (winningCard.farbe.equals(Statics.HERZ) && !winningCard.trumpf) {
+            if (winningCard.suit.equals(Statics.HERZ) && !winningCard.trump) {
                 herzstich = 1;
             }
         }
@@ -223,7 +217,7 @@ public class Stich {
     private void checkKarlchen() {
         if(config.sonderpunkte.get(KARLCHEN)) {
             if (stichnumber == 9) {
-                if (winningCard.farbe.equals(Statics.KREUZ) && winningCard.value.equals(Statics.BUBE)) {
+                if (winningCard.suit.equals(Statics.KREUZ) && winningCard.kind.equals(Statics.BUBE)) {
                     karlchen = 1;
                     log.info("Karlchen");
                 }
@@ -239,9 +233,9 @@ public class Stich {
         cardMap.keySet().forEach(card -> s
                 .append(cardMap.get(card))
                 .append(":")
-                .append(card.farbe)
+                .append(card.suit)
                 .append(" ")
-                .append(card.value)
+                .append(card.kind)
                 .append("\n"));
         return s.toString();
     }

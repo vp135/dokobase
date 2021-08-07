@@ -1,23 +1,41 @@
 package base;
 
+import base.doko.DokoCards;
+import base.skat.SkatCards;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class BaseCard {
+public class BaseCard {
 
     public int order;
-    public String value;
-    public String farbe;
-    public boolean trumpf;
+    public String kind;
+    public String suit;
+    public boolean trump;
+    public int value;
 
-    public BaseCard(String value, String farbe, boolean trumpf) {
-        this.value = value;
-        this.farbe = farbe;
-        this.trumpf = trumpf;
+    public BaseCard(String kind, String suit){
+        this.kind = kind;
+        this.suit = suit;
+        this.trump = false;
     }
 
-    protected abstract boolean isTrumpf(Object object);
+    public BaseCard(String kind, String suit, boolean trump) {
+        this.kind = kind;
+        this.suit = suit;
+        this.trump = trump;
+    }
+
+    public BaseCard(String kind, String suit, Object game){
+        this.kind = kind;
+        this.suit = suit;
+        if(game instanceof  base.doko.messages.MessageGameSelected.GAMES) {
+            this.trump = DokoCards.isTrumpf(this, game);
+    }else if(game instanceof base.skat.messages.MessageGameSelected.GAMES){
+            this.trump = SkatCards.isTrumpf(this, game);
+        }
+    }
 
     public static List<String> UNIQUE_CARDS = new ArrayList<>(Arrays.asList(
             Statics.KREUZ+Statics.SIEBEN,
@@ -53,7 +71,15 @@ public abstract class BaseCard {
             Statics.KARO+Statics.KOENIG,
             Statics.KARO+Statics.ASS));
 
+    public static BaseCard fromString(String string) {
+        return new BaseCard(string.split(" ")[0],string.split(" ")[1]);
+    }
+
     public String toTrimedString() {
-        return this.farbe+this.value;
+        return this.suit +this.kind;
+    }
+
+    public String toString(){
+        return (this.suit +" "+this.kind);
     }
 }

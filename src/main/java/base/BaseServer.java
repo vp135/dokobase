@@ -1,9 +1,8 @@
 package base;
 
 import base.messages.*;
-import base.messages.admin.AbortGame;
-import base.messages.admin.SetAdmin;
-import com.google.gson.JsonArray;
+import base.messages.admin.MessageAbortGame;
+import base.messages.admin.MessageSetAdmin;
 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -54,10 +53,10 @@ public class BaseServer implements IServerMessageHandler{
                 beginner = 0;
             }
         }
-        send2All(new StartGame(gameType.name()));
+        send2All(new MessageStartGame(gameType.name()));
         players.stream().filter(player -> player.getName().equals(adminName))
                 .collect(Collectors.toList()).forEach(player ->{
-            queueOut(player,new SetAdmin(true));
+            queueOut(player,new MessageSetAdmin(true));
             player.setAdmin(true);
         });
     }
@@ -70,76 +69,85 @@ public class BaseServer implements IServerMessageHandler{
 
     }
 
-    protected void queueOut(Player player, RequestObject message) {
+    protected void queueOut(Player player, Message message) {
         player.queue(message);
     }
 
-    protected void send2All(RequestObject message){
+    protected void send2All(Message message){
         players.forEach(player -> player.queue(message));
     }
 
     @Override
     public void handleInput(MessageIn message) {
-        RequestObject requestObject = RequestObject.fromString(message.getInput());
+        Message requestObject = Message.fromString(message.getInput());
         Socket socket = message.getSocket();
         switch (requestObject.getCommand()) {
-            case AddPlayer.COMMAND:
-                String name = requestObject.getParams().get("player").getAsString();
-                if(players.stream().noneMatch(player -> player.getName().equals(name))) {
-                    players.add(new Player(requestObject.getParams().get("player").getAsString(),
-                            players.size(), socket, false, comServer));
-
-                    List<String> list = new ArrayList<>();
-                    players.forEach(p -> list.add(p.getName()));
-                    send2All(new PlayersInLobby(list));
-                }
-                else{
-                    players.stream().filter(player -> player.getName().equals(name)).findFirst().ifPresent(player -> {
-                        player.setSocket(socket);
-                        if(gameRunning) {
-                            updateReconnectedPlayer(player);
-                        }
-                        else {
-                            List<String> list = new ArrayList<>();
-                            players.forEach(p -> list.add(p.getName()));
-                            comServer.queueOut(player.getSocket(), new PlayersInLobby(list), true);
-                        }
-
-                    });
-                }
+            case MessageAddPlayer.COMMAND:
+                handleAddPlayer(requestObject, socket);
                 break;
-            case ChangePlayerOrder.COMMAND:
-                List<Player> pList = new ArrayList<>();
-                List<String> sList = new ArrayList<>();
-                JsonArray pArray = requestObject.getParams().get("players").getAsJsonArray();
-                pArray.forEach(j-> {
-                    pList.add(players.stream().filter(p->p.getName().equals(j.getAsString())).findFirst().get());
-                    sList.add(j.getAsString());
-                });
-                players.clear();
-                players.addAll(pList);
-                send2All(new PlayersInLobby(sList));
+            case MessagePlayerList.CHANGE_ORDER:
+                handleChangePlayerOrder(requestObject);
                 break;
-            case AbortGame.COMMAND:{
+            case MessageAbortGame.COMMAND:{
                 endIt();
                 break;
             }
-            case GetVersion.COMMAND:
+            case MessageGetVersion.COMMAND:
                 comServer.queueOut(socket,
-                        new GetVersion("Server", Statics.VERSION),true);
+                        new MessageGetVersion("Server", Statics.VERSION),true);
                 break;
-            case AdminRequest.COMMAND:
+            case MessageAdminRequest.COMMAND:
                 handleAdminRequest(requestObject);
                 break;
         }
     }
 
-    protected void updateReconnectedPlayer(Player player) {
-        player.queue(new SetAdmin(player.isAdmin()));
+    private void handleChangePlayerOrder(Message message) {
+        MessagePlayerList messagePlayerList = new MessagePlayerList(message);
+        List<Player> pList = new ArrayList<>();
+        List<String> sList = new ArrayList<>();
+        messagePlayerList.getPlayerNamesList().forEach(s-> {
+            pList.add(players.stream().filter(p->p.getName().equals(s)).findFirst().get());
+            sList.add(s);
+        });
+        players.clear();
+        players.addAll(pList);
+        send2All(MessagePlayerList.playerOrderChanged(sList));
     }
 
-    private void handleAdminRequest(RequestObject requestObject) {
-        switch (Statics.ADMINREQUESTS.getName(requestObject.getParams().get("request").getAsInt())){
+    private void handleAddPlayer(Message message, Socket socket) {
+        MessageAddPlayer messageAddPlayer = new MessageAddPlayer(message);
+        String name = messageAddPlayer.getPlayerName();
+        if(players.stream().noneMatch(player -> player.getName().equals(name))) {
+            players.add(new Player(messageAddPlayer.getPlayerName(),
+                    players.size(), socket, false, comServer));
+
+            List<String> list = new ArrayList<>();
+            players.forEach(p -> list.add(p.getName()));
+            send2All(MessagePlayerList.playersInLobby(list));
+        }
+        else{
+            players.stream().filter(player -> player.getName().equals(name)).findFirst().ifPresent(player -> {
+                player.setSocket(socket);
+                if(gameRunning) {
+                    updateReconnectedPlayer(player);
+                }
+                else {
+                    List<String> list = new ArrayList<>();
+                    players.forEach(p -> list.add(p.getName()));
+                    comServer.queueOut(player.getSocket(), MessagePlayerList.playersInLobby(list), true);
+                }
+            });
+        }
+    }
+
+    protected void updateReconnectedPlayer(Player player) {
+        player.queue(new MessageSetAdmin(player.isAdmin()));
+    }
+
+    private void handleAdminRequest(Message message) {
+        MessageAdminRequest messageAdminRequest = new MessageAdminRequest(message);
+        switch (messageAdminRequest.getRequest()){
             case NOTHING:
                 break;
             case SHUFFLE:
@@ -155,11 +163,11 @@ public class BaseServer implements IServerMessageHandler{
     }
 
     private void endClients() {
-        send2All(new EndClients());
+        send2All(new MessageEndClients());
     }
 
     private void ackowledge() {
-        send2All(new Acknowledge());
+        send2All(new MessageAcknowledge());
     }
 
     public void setAdmin(String name) {

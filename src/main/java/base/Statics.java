@@ -14,6 +14,7 @@ public class Statics {
     public static final String DAME = "Dame";
     public static final String KOENIG = "Koenig";
     public static final String ASS = "Ass";
+    public static final String TRUMPF = "Trumpf";
 
     public enum game{
         DOKO,

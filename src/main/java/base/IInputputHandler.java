@@ -1,7 +1,7 @@
 package base;
 
-import base.messages.RequestObject;
+import base.messages.Message;
 
 public interface IInputputHandler {
-    void handleInput(RequestObject input);
+    void handleInput(Message input);
 }

@@ -1,15 +1,15 @@
 package base;
 
-import base.messages.RequestObject;
+import base.messages.Message;
 
 import java.net.Socket;
 
 public class MessageOut {
 
     private final Socket socket;
-    private final RequestObject output;
+    private final Message output;
 
-    public MessageOut(java.net.Socket socket, RequestObject output) {
+    public MessageOut(java.net.Socket socket, Message output) {
         this.socket = socket;
         this.output = output;
     }
@@ -18,7 +18,7 @@ public class MessageOut {
         return socket;
     }
 
-    public RequestObject getOutput() {
+    public Message getOutput() {
         return output;
     }
 }

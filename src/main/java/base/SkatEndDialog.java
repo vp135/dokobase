@@ -1,10 +1,7 @@
 package base;
 
-import base.BaseCard;
-import base.Player;
-import base.Statics;
 import base.skat.Stich;
-import base.skat.messages.GameSelected;
+import base.skat.messages.MessageGameSelected;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,10 +23,10 @@ public class SkatEndDialog {
     private String player2String;
     private String player3String;
     private int remaining = 120;
-    private final GameSelected.GAMES game;
+    private final MessageGameSelected.GAMES game;
     private JDialog d;
 
-    public SkatEndDialog(GameSelected.GAMES game, List<Player> players, List<Stich> stichList, List<BaseCard> skat){
+    public SkatEndDialog(MessageGameSelected.GAMES game, List<Player> players, List<Stich> stichList, List<BaseCard> skat){
         this.game = game;
         this.players = players;
         this.stichList = stichList;
@@ -53,7 +50,7 @@ public class SkatEndDialog {
             remaining -= stich.getPoints();
         });
 
-        if(game==GameSelected.GAMES.Ramsch){
+        if(game== MessageGameSelected.GAMES.Ramsch){
             players.forEach(player -> {
                 if(player.getNumber()==stichList.get(stichList.size()-1).getWinner()){
                     player.addPoints(skatPoints);
@@ -86,7 +83,7 @@ public class SkatEndDialog {
             playerBuilder[i].append("</html>");
         }
 
-        if(game== GameSelected.GAMES.Ramsch){
+        if(game== MessageGameSelected.GAMES.Ramsch){
             reString1 = "";
             kontraString1 ="";
         }else{
@@ -152,7 +149,7 @@ public class SkatEndDialog {
         return remaining;
     }
 
-    public SkatEndDialog(IDialogInterface client, GameSelected.GAMES game, String re1, String kontra1,
+    public SkatEndDialog(IDialogInterface client, MessageGameSelected.GAMES game, String re1, String kontra1,
                          String player1String, String player2String, String player3String,
                          int remaining) {
         this.client = client;
@@ -227,7 +224,7 @@ public class SkatEndDialog {
     private static int getSkatPoints(List<BaseCard> skat){
         int result = 0;
         for(BaseCard c : skat) {
-            switch (c.value) {
+            switch (c.kind) {
                 case Statics.ZEHN: {
                     result += 10;
                     break;

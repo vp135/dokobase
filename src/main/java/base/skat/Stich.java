@@ -3,37 +3,36 @@ package base.skat;
 import base.BaseCard;
 import base.Player;
 import base.Statics;
-import base.skat.messages.GameSelected;
+import base.skat.messages.MessageGameSelected;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Stich {
 
-    private final transient HashMap<Card, Integer> cardMap = new HashMap<>();
+    private final transient HashMap<BaseCard, Integer> cardMap = new HashMap<>();
     private int points;
     private int winner;
     private final int stichnumber;
-    private Card winningCard;
+    private BaseCard winningCard;
     private int summe;
     private final List<Player> players;
-    private final GameSelected.GAMES gameType;
+    private final MessageGameSelected.GAMES gameType;
 
 
-    public Stich(List<Player> players, int stichnumber, GameSelected.GAMES gameType){
+    public Stich(List<Player> players, int stichnumber, MessageGameSelected.GAMES gameType){
         this.players = players;
         this.stichnumber = stichnumber;
         this.gameType = gameType;
     }
 
-    public void addCard(Player player, Card card){
-        card.trumpf = card.isTrumpf(gameType);
+    public void addCard(Player player, BaseCard card){
+        card.trump = SkatCards.isTrumpf(card,gameType);
         card.order= cardMap.size();
         cardMap.put(card, player.getNumber());
     }
 
-    public HashMap<Card, Integer> getCardMap() {
+    public HashMap<BaseCard, Integer> getCardMap() {
         return cardMap;
     }
 
@@ -45,11 +44,11 @@ public class Stich {
 
 
     public int getWinner() {
-        Card currentWinner = cardMap.keySet().stream().filter(card -> card.order==0).findFirst().get();
+        BaseCard currentWinner = cardMap.keySet().stream().filter(card -> card.order==0).findFirst().get();
         if(cardMap.size()==3){
             for(int i = 1; i<cardMap.size();i++){
                 int finalI = i;
-                Card nextCard = cardMap.keySet().stream().filter(card -> card.order== finalI).findFirst().get();
+                BaseCard nextCard = cardMap.keySet().stream().filter(card -> card.order== finalI).findFirst().get();
                 switch (gameType) {
                     case Karo:
                         currentWinner = Compare.karo(currentWinner,nextCard);
@@ -81,8 +80,8 @@ public class Stich {
 
     public int calculatePoints(){
         int result=0;
-        for (Card card:this.cardMap.keySet()){
-            switch (card.value){
+        for (BaseCard card:this.cardMap.keySet()){
+            switch (card.kind){
                 case Statics.ZEHN:{
                     result+=10;
                     break;
@@ -113,7 +112,7 @@ public class Stich {
         return points;
     }
 
-    public Card getWinningCard(){
+    public BaseCard getWinningCard(){
         return winningCard;
     }
 
@@ -124,9 +123,9 @@ public class Stich {
         cardMap.keySet().forEach(card -> s
                 .append(cardMap.get(card))
                 .append(":")
-                .append(card.farbe)
+                .append(card.suit)
                 .append(" ")
-                .append(card.value)
+                .append(card.kind)
                 .append("\n"));
         return s.toString();
     }

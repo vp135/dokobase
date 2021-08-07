@@ -1,85 +1,86 @@
 package base.skat;
 
+import base.BaseCard;
 import base.Statics;
 
 public class Compare {
 
-    public static Card karo (Card first, Card second){
+    public static BaseCard karo (BaseCard first, BaseCard second){
         return farbSolo(first,second);
     }
 
-    public static Card herz (Card first, Card second){
+    public static BaseCard herz (BaseCard first, BaseCard second){
         return farbSolo(first,second);
     }
 
-    public static Card pik (Card first, Card second){
+    public static BaseCard pik (BaseCard first, BaseCard second){
         return farbSolo(first,second);
     }
 
-    public static Card kreuz (Card first, Card second){
+    public static BaseCard kreuz (BaseCard first, BaseCard second){
         return farbSolo(first,second);
     }
 
-    public static Card farbSolo(Card first, Card second) {
-        if (first.trumpf && !second.trumpf) {
+    public static BaseCard farbSolo(BaseCard first, BaseCard second) {
+        if (first.trump && !second.trump) {
             return first;
-        } else if (!first.trumpf && second.trumpf) {
+        } else if (!first.trump && second.trump) {
             return second;
-        } else if (!first.trumpf) {
-            if (!first.farbe.equals(second.farbe)) {
+        } else if (!first.trump) {
+            if (!first.suit.equals(second.suit)) {
                 return first;
             } else {
                 return getWinnerForSameColor(first, second);
             }
         } else {
-            switch (first.value) {
+            switch (first.kind) {
                 case Statics.SIEBEN:
                     return second;
                 case Statics.ACHT:
-                    if (second.value.equals(Statics.SIEBEN)) {
+                    if (second.kind.equals(Statics.SIEBEN)) {
                         return first;
                     } else {
                         return second;
                     }
                 case Statics.NEUN:
-                    if (second.value.equals(Statics.SIEBEN) ||
-                            second.value.equals(Statics.ACHT)) {
+                    if (second.kind.equals(Statics.SIEBEN) ||
+                            second.kind.equals(Statics.ACHT)) {
                         return first;
                     } else {
                         return second;
                     }
                 case Statics.DAME:
-                    if (second.value.equals(Statics.KOENIG) ||
-                            second.value.equals(Statics.ZEHN) ||
-                            second.value.equals(Statics.ASS) ||
-                            second.value.equals(Statics.BUBE)) {
+                    if (second.kind.equals(Statics.KOENIG) ||
+                            second.kind.equals(Statics.ZEHN) ||
+                            second.kind.equals(Statics.ASS) ||
+                            second.kind.equals(Statics.BUBE)) {
                         return second;
                     } else {
                         return first;
                     }
                 case Statics.KOENIG:
-                    if (second.value.equals(Statics.ZEHN) ||
-                            second.value.equals(Statics.ASS) ||
-                            second.value.equals(Statics.BUBE)) {
+                    if (second.kind.equals(Statics.ZEHN) ||
+                            second.kind.equals(Statics.ASS) ||
+                            second.kind.equals(Statics.BUBE)) {
                         return second;
                     } else {
                         return first;
                     }
                 case Statics.ZEHN:
-                    if (second.value.equals(Statics.ASS) ||
-                            second.value.equals(Statics.BUBE)) {
+                    if (second.kind.equals(Statics.ASS) ||
+                            second.kind.equals(Statics.BUBE)) {
                         return second;
                     } else {
                         return first;
                     }
                 case Statics.ASS:
-                    if (second.value.equals(Statics.BUBE)) {
+                    if (second.kind.equals(Statics.BUBE)) {
                         return second;
                     } else {
                         return first;
                     }
                 case Statics.BUBE:
-                    if (second.value.equals(Statics.BUBE)) {
+                    if (second.kind.equals(Statics.BUBE)) {
                         return getWinnerBuben(first, second);
                     } else {
                         return first;
@@ -89,14 +90,14 @@ public class Compare {
         return first;
     }
 
-    public static Card grand (Card first, Card second){
-        if(first.value.equals(Statics.BUBE)&&second.value.equals(Statics.BUBE)){
+    public static BaseCard grand (BaseCard first, BaseCard second){
+        if(first.kind.equals(Statics.BUBE)&&second.kind.equals(Statics.BUBE)){
             return getWinnerBuben(first,second);
         }
-        else if(first.value.equals(Statics.BUBE)){
+        else if(first.kind.equals(Statics.BUBE)){
             return first;
         }
-        else if(second.value.equals(Statics.BUBE)){
+        else if(second.kind.equals(Statics.BUBE)){
             return second;
         }
         else{
@@ -104,49 +105,49 @@ public class Compare {
         }
     }
 
-    public static Card nullspiel(Card first, Card second){
-        if(first.farbe.equals(second.farbe)) {
-            switch (first.value) {
+    public static BaseCard nullspiel(BaseCard first, BaseCard second){
+        if(first.suit.equals(second.suit)) {
+            switch (first.kind) {
                 case Statics.SIEBEN:
                     return second;
                 case Statics.ACHT:
-                    if (second.value.equals(Statics.SIEBEN)) {
+                    if (second.kind.equals(Statics.SIEBEN)) {
                         return first;
                     } else {
                         return second;
                     }
                 case Statics.NEUN:
-                    if (second.value.equals(Statics.SIEBEN) ||
-                            second.value.equals(Statics.ACHT)) {
+                    if (second.kind.equals(Statics.SIEBEN) ||
+                            second.kind.equals(Statics.ACHT)) {
                         return first;
                     } else {
                         return second;
                     }
                 case Statics.ZEHN:
-                    if (second.value.equals(Statics.SIEBEN) ||
-                            second.value.equals(Statics.ACHT) ||
-                            second.value.equals(Statics.NEUN)) {
+                    if (second.kind.equals(Statics.SIEBEN) ||
+                            second.kind.equals(Statics.ACHT) ||
+                            second.kind.equals(Statics.NEUN)) {
                         return first;
                     } else {
                         return second;
                     }
                 case Statics.BUBE:
-                    if (second.value.equals(Statics.DAME) ||
-                            second.value.equals(Statics.KOENIG) ||
-                            second.value.equals(Statics.ASS)) {
+                    if (second.kind.equals(Statics.DAME) ||
+                            second.kind.equals(Statics.KOENIG) ||
+                            second.kind.equals(Statics.ASS)) {
                         return second;
                     } else {
                         return first;
                     }
                 case Statics.DAME:
-                    if (second.value.equals(Statics.KOENIG) ||
-                            second.value.equals(Statics.ASS)) {
+                    if (second.kind.equals(Statics.KOENIG) ||
+                            second.kind.equals(Statics.ASS)) {
                         return second;
                     } else {
                         return first;
                     }
                 case Statics.KOENIG:
-                    if (second.value.equals(Statics.ASS)) {
+                    if (second.kind.equals(Statics.ASS)) {
                         return second;
                     } else {
                         return first;
@@ -158,41 +159,41 @@ public class Compare {
         return first;
     }
 
-    private static Card getWinnerForSameColor(Card first, Card second) {
-        if(first.farbe.equals(second.farbe)){
-            switch (first.value) {
+    private static BaseCard getWinnerForSameColor(BaseCard first, BaseCard second) {
+        if(first.suit.equals(second.suit)){
+            switch (first.kind) {
                 case Statics.SIEBEN:
                     return second;
                 case Statics.ACHT:
-                    if (second.value.equals(Statics.SIEBEN)) {
+                    if (second.kind.equals(Statics.SIEBEN)) {
                         return first;
                     } else {
                         return second;
                     }
                 case Statics.NEUN:
-                    if (second.value.equals(Statics.SIEBEN) ||
-                            second.value.equals(Statics.ACHT)) {
+                    if (second.kind.equals(Statics.SIEBEN) ||
+                            second.kind.equals(Statics.ACHT)) {
                         return first;
                     } else {
                         return second;
                     }
                 case Statics.DAME:
-                    if (second.value.equals(Statics.KOENIG) ||
-                            second.value.equals(Statics.ZEHN) ||
-                            second.value.equals(Statics.ASS)) {
+                    if (second.kind.equals(Statics.KOENIG) ||
+                            second.kind.equals(Statics.ZEHN) ||
+                            second.kind.equals(Statics.ASS)) {
                         return second;
                     } else {
                         return first;
                     }
                 case Statics.KOENIG:
-                    if (second.value.equals(Statics.ZEHN) ||
-                            second.value.equals(Statics.ASS)) {
+                    if (second.kind.equals(Statics.ZEHN) ||
+                            second.kind.equals(Statics.ASS)) {
                         return second;
                     } else {
                         return first;
                     }
                 case Statics.ZEHN:
-                    if (second.value.equals(Statics.ASS)) {
+                    if (second.kind.equals(Statics.ASS)) {
                         return second;
                     } else {
                         return first;
@@ -204,18 +205,18 @@ public class Compare {
         return first;
     }
 
-    private static Card getWinnerBuben(Card first, Card second) {
-        switch (first.farbe) {
+    private static BaseCard getWinnerBuben(BaseCard first, BaseCard second) {
+        switch (first.suit) {
             case Statics.KREUZ:
                 return first;
             case Statics.PIK:
-                if (second.farbe.equals(Statics.KREUZ)) {
+                if (second.suit.equals(Statics.KREUZ)) {
                     return second;
                 } else {
                     return first;
                 }
             case Statics.HERZ:
-                if (second.farbe.equals(Statics.KARO)) {
+                if (second.suit.equals(Statics.KARO)) {
                     return first;
                 } else {
                     return second;

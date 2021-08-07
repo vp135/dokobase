@@ -1,6 +1,6 @@
 package base;
 
-import base.messages.RequestObject;
+import base.messages.Message;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -123,17 +123,17 @@ public class ComServer {
 
     public boolean sendReply(MessageOut message) {
         Socket socketConnection = message.getSocket();
-        RequestObject requestObject = message.getOutput();
+        Message requestObject = message.getOutput();
         return sendReply(socketConnection, requestObject);
     }
 
-    public boolean sendReply(Socket socketConnection, RequestObject requestObject) {
+    public boolean sendReply(Socket socketConnection, Message message) {
         boolean sent = false;
         if (!socketConnection.isClosed()) {
             try {
                 PrintWriter out = new PrintWriter(new BufferedWriter(
                         new OutputStreamWriter(socketConnection.getOutputStream())), true);
-                String s = requestObject.toJson();
+                String s = message.toJson();
                 out.println(s);
                 log.info(s);
                 sent = true;
@@ -144,7 +144,7 @@ public class ComServer {
         return sent;
     }
 
-    public void queueOut(Socket socket, RequestObject message, boolean resetEvent){
+    public void queueOut(Socket socket, Message message, boolean resetEvent){
         outMessages.offer(new MessageOut(socket,message));
         log.info("added message: " + message.getCommand());
         if(resetEvent) {
@@ -156,7 +156,7 @@ public class ComServer {
         this.server = server;
     }
 
-    public void send2All(List<Socket> sockets, RequestObject message) {
+    public void send2All(List<Socket> sockets, Message message) {
         sockets.forEach(socket -> queueOut(socket,message,false));
         evOut.set();
     }

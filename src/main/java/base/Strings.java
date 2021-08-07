@@ -1,6 +1,6 @@
 package base;
 
-import base.doko.messages.GameSelected;
+import base.doko.messages.MessageGameSelected;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +54,7 @@ public class Strings {
     ));
 
 
-    public static String getGameName(GameSelected.GAMES game){
+    public static String getGameName(MessageGameSelected.GAMES game){
         switch (game){
             case BUBEN:
                 return "Bubensolo";
