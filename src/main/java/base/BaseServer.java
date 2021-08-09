@@ -6,6 +6,7 @@ import base.messages.admin.MessageSetAdmin;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,12 +21,28 @@ public class BaseServer implements IServerMessageHandler{
     protected boolean gameRunning = false;
     protected int beginner=-1;
 
+
+    protected int currentStichNumber =0;
+    protected HashMap<Integer,Boolean> readyMap;
+    protected int currentPlayer = 0;
+    protected HashMap<Integer,Integer> points = new HashMap<>();
+    protected boolean wait4NextRound = false;
+    protected int spectator;
+
     public BaseServer(Configuration c, ComServer comServer) {
         this.c = c;
         this.comServer = comServer;
         comServer.setServer(this);
-
     }
+
+    protected void prepareGameServer(BaseServer server) {
+        this.beginner = server.beginner;
+        server.comServer.setServer(this);
+        this.players.addAll(server.players);
+        c.lastGame = gameType.name();
+        gameRunning = true;
+    }
+
 
     private void DisplayMessageQueues() {
         new Thread(() -> {
@@ -81,25 +98,64 @@ public class BaseServer implements IServerMessageHandler{
     public void handleInput(MessageIn message) {
         Message requestObject = Message.fromString(message.getInput());
         Socket socket = message.getSocket();
-        switch (requestObject.getCommand()) {
-            case MessageAddPlayer.COMMAND:
-                handleAddPlayer(requestObject, socket);
-                break;
-            case MessagePlayerList.CHANGE_ORDER:
-                handleChangePlayerOrder(requestObject);
-                break;
-            case MessageAbortGame.COMMAND:{
-                endIt();
-                break;
+        try {
+            switch (requestObject.getCommand()) {
+                case MessageAddPlayer.COMMAND:
+                    handleAddPlayer(requestObject, socket);
+                    break;
+                case MessagePlayerList.CHANGE_ORDER:
+                    handleChangePlayerOrder(requestObject);
+                    break;
+                case MessagePutCard.COMMAND:
+                    handlePutCard(requestObject);
+                    break;
+                case MessageAbortGame.COMMAND:
+                    endIt();
+                    break;
+                case MessageReadyForNextRound.COMMAND:
+                    handleReadyForNextRound(requestObject);
+                    break;
+                case MessageGetVersion.COMMAND:
+                    comServer.queueOut(socket, new MessageGetVersion("Server", Statics.VERSION), true);
+                    break;
+                case MessageAdminRequest.COMMAND:
+                    handleAdminRequest(requestObject);
+                    break;
             }
-            case MessageGetVersion.COMMAND:
-                comServer.queueOut(socket,
-                        new MessageGetVersion("Server", Statics.VERSION),true);
-                break;
-            case MessageAdminRequest.COMMAND:
-                handleAdminRequest(requestObject);
-                break;
+        } catch (Exception ex) {
+            log.error(ex.toString());
         }
+    }
+
+
+
+    protected void handlePutCard(Message message){
+
+    }
+
+    protected void handleReadyForNextRound(Message message) {
+        if(wait4NextRound){
+            MessageReadyForNextRound messageReadyForNextRound = new MessageReadyForNextRound(message);
+            readyMap.put(messageReadyForNextRound.getPlayerNumber(), true);
+            players.stream().filter(Player::isAdmin).forEach(p->p.queue(new MessageDisplayMessage(
+                    players.get(messageReadyForNextRound.getPlayerNumber()).getName()+ " ist bereit")));
+        }
+        if(readyMap.values().stream().allMatch(p-> p)){
+            nextGame();
+        }
+    }
+
+    protected void nextGame(){
+
+    }
+
+    protected void runGame(int player) {
+        points = new HashMap<>();
+        for (int i = 0; i < players.size(); i++) {
+            points.put(i, 0);
+        }
+        currentPlayer = player;
+        currentStichNumber = 0;
     }
 
     private void handleChangePlayerOrder(Message message) {

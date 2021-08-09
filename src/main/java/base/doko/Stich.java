@@ -37,7 +37,7 @@ public class Stich {
     }
 
     public void addCard(Player player, BaseCard card){
-        card.order= cardMap.size();
+        card.playOrder = cardMap.size();
         cardMap.put(card, player.getNumber());
     }
 
@@ -50,11 +50,11 @@ public class Stich {
     }
 
     public int getWinner(boolean schwein) {
-        BaseCard currentWinner = cardMap.keySet().stream().filter(card -> card.order==0).findFirst().get();
+        BaseCard currentWinner = cardMap.keySet().stream().filter(card -> card.playOrder ==0).findFirst().get();
         if(cardMap.size()==4){
             for(int i = 1; i<cardMap.size();i++){
                 int finalI = i;
-                BaseCard nextCard = cardMap.keySet().stream().filter(card -> card.order== finalI).findFirst().get();
+                BaseCard nextCard = cardMap.keySet().stream().filter(card -> card.playOrder == finalI).findFirst().get();
                 switch (gameType) {
                     case NORMAL:
                     case ARMUT:
@@ -186,7 +186,7 @@ public class Stich {
 
     private void checkFuchsGefangen() {
         fuchsGefangen = 0;
-        if(config.sonderpunkte.get(FUCHS)) {
+        if(config.sonderpunkte.fuchs) {
             cardMap.keySet().stream().filter(card -> (card.suit.equals(Statics.KARO) && card.kind.equals(Statics.ASS)))
                     .collect(Collectors.toList()).forEach(card -> {
                         if (players.get(cardMap.get(card)).isRe() != players.get(winner).isRe()) {
@@ -198,7 +198,7 @@ public class Stich {
     }
 
     private void checkHerzStich() {
-        if(config.sonderpunkte.get(HERZSTICH)) {
+        if(config.sonderpunkte.herzstich) {
             if (winningCard.suit.equals(Statics.HERZ) && !winningCard.trump) {
                 herzstich = 1;
             }
@@ -206,7 +206,7 @@ public class Stich {
     }
 
     private void checkDoppelkopf() {
-        if(config.sonderpunkte.get(DOPPELKOPF)) {
+        if(config.sonderpunkte.doppelkopf) {
             if (summe > 39) {
                 doppelkopf = 1;
                 log.info("Doppelkopf");
@@ -215,7 +215,7 @@ public class Stich {
     }
 
     private void checkKarlchen() {
-        if(config.sonderpunkte.get(KARLCHEN)) {
+        if(config.sonderpunkte.karlchen) {
             if (stichnumber == 9) {
                 if (winningCard.suit.equals(Statics.KREUZ) && winningCard.kind.equals(Statics.BUBE)) {
                     karlchen = 1;

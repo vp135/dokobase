@@ -28,7 +28,7 @@ public class Stich {
 
     public void addCard(Player player, BaseCard card){
         card.trump = SkatCards.isTrumpf(card,gameType);
-        card.order= cardMap.size();
+        card.playOrder = cardMap.size();
         cardMap.put(card, player.getNumber());
     }
 
@@ -44,11 +44,11 @@ public class Stich {
 
 
     public int getWinner() {
-        BaseCard currentWinner = cardMap.keySet().stream().filter(card -> card.order==0).findFirst().get();
+        BaseCard currentWinner = cardMap.keySet().stream().filter(card -> card.playOrder ==0).findFirst().get();
         if(cardMap.size()==3){
             for(int i = 1; i<cardMap.size();i++){
                 int finalI = i;
-                BaseCard nextCard = cardMap.keySet().stream().filter(card -> card.order== finalI).findFirst().get();
+                BaseCard nextCard = cardMap.keySet().stream().filter(card -> card.playOrder == finalI).findFirst().get();
                 switch (gameType) {
                     case Karo:
                         currentWinner = Compare.karo(currentWinner,nextCard);

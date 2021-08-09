@@ -1,6 +1,10 @@
 package base.messages;
 
 import base.BaseCard;
+import base.DokoConfig;
+import base.Statics;
+import base.doko.DokoCards;
+import base.skat.SkatCards;
 import com.google.gson.JsonObject;
 
 import java.util.HashMap;
@@ -16,7 +20,7 @@ public class MessageCurrentStich extends Message {
     public MessageCurrentStich(Map<BaseCard, Integer> map){
         this.command = CURRENT;
         this.params = new JsonObject();
-        map.keySet().forEach(p-> this.params.addProperty(map.get(p).toString(),p.toString()));
+        map.keySet().forEach(p-> this.params.addProperty(map.get(p).toString(),p.cardNumber));
     }
 
     public MessageCurrentStich(Map<BaseCard, Integer> map, int player, boolean isLast) {
@@ -32,7 +36,7 @@ public class MessageCurrentStich extends Message {
         map.keySet().forEach(key-> baseMap.put(key,map.get(key)));
         this.command = command;
         this.params = new JsonObject();
-        baseMap.keySet().forEach(p-> this.params.addProperty(baseMap.get(p).toString(),p.suit +" "+p.kind));
+        baseMap.keySet().forEach(p-> this.params.addProperty(baseMap.get(p).toString(),p.cardNumber));
     }
 
     public MessageCurrentStich(Message message){
@@ -40,11 +44,19 @@ public class MessageCurrentStich extends Message {
         this.params = message.getParams();
     }
 
-    public Map<Integer,BaseCard> GetStichMap(){
-        Map<Integer,BaseCard> map = new HashMap<>();
-        params.keySet().forEach(k-> map.put(Integer.parseInt(k),BaseCard.fromString(params.get(k).getAsString())));
+    public Map<Integer,BaseCard> GetStichMap(Statics.game game) {
+        Map<Integer, BaseCard> map = new HashMap<>();
+        switch (game) {
+            case DOKO:
+                params.keySet().forEach(k -> map.put(Integer.parseInt(k), DokoCards.ALL_CARDS.get(params.get(k).getAsInt())));
+                break;
+            case SKAT:
+                params.keySet().forEach(k -> map.put(Integer.parseInt(k), SkatCards.ALL_CARDS.get(params.get(k).getAsInt())));
+                break;
+        }
         return map;
     }
+
 
     public int getPlayerNumber(){
         return params.get("player").getAsInt();

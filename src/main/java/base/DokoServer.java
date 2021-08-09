@@ -1,13 +1,9 @@
 package base;
 
 import base.doko.DokoCards;
-import base.doko.messages.MessageGameEnd;
+import base.messages.*;
 import base.doko.Stich;
 import base.doko.messages.*;
-import base.messages.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -22,55 +18,30 @@ public class DokoServer extends BaseServer{
 
     Random random = new Random(System.currentTimeMillis());
 
-
-
-    private int currentStichNumber =0;
-    private boolean wait4Gesund = false;
-    private boolean wait4NextRound = false;
-    private boolean schwein = false;
+    private List<Stich> stichList = new ArrayList<>();
     private Stich stich;
-    private List<Stich> stichList;
-    private List<BaseCard> armutCards;
-    private HashMap<Integer,Boolean> readyMap;
-    private HashMap<Integer,Integer> points;
-    private HashMap<Integer, MessageGameSelected.GAMES> gameSelection = new HashMap<>();
-
-    private int currentPlayer = 0;
     private MessageGameSelected.GAMES selectedGame = NORMAL;
 
+
+
+    private boolean wait4Gesund = false;
+    private boolean schwein = false;
+    private List<BaseCard> armutCards;
+    private HashMap<Integer, MessageGameSelected.GAMES> gameSelection = new HashMap<>();
     private int aufspieler = -1;
     private int armutplayer = -1;
     private int hochzeitSpieler = -1;
-    private int spectator=4;
-
-
-
     private List<Player> players2Ask = new ArrayList<>();
     private boolean wait4Partner;
 
 
     public DokoServer(BaseServer server){
         super(server.c, server.comServer);
-        this.beginner = server.beginner;
-        server.comServer.setServer(this);
-        this.players.addAll(server.players);
         gameType = Statics.game.DOKO;
-        c.lastGame = gameType.name();
-        gameRunning = true;
+        spectator = 4;
+        prepareGameServer(server);
     }
 
-
-    private void runGame(int player){
-        points = new HashMap<>();
-        for (int i = 0;i< players.size();i++) {
-            points.put(i,0);
-        }
-        currentPlayer = player;
-        aufspieler = -1;
-        currentStichNumber =0;
-        send2All(new MessageGameType(selectedGame));
-        send2All(new MessageWait4Player(players.stream().filter(p -> p.getNumber()==player).findAny().get().getName()));
-    }
 
     @Override
     public void handleInput(MessageIn message) {
@@ -79,123 +50,115 @@ public class DokoServer extends BaseServer{
         Socket socketConnection = message.getSocket();
         players.stream().filter(player -> player.getSocket()==socketConnection).findFirst().ifPresent(
                 player -> log.info("Received: " + requestObject.getCommand() + " from " + player.getName()));
-        switch (requestObject.getCommand()) {
-            case MessagePutCard.COMMAND: {
-                handlePutCard(requestObject);
-                break;
+        try {
+            switch (requestObject.getCommand()) {
+                case MessageGameSelected.COMMAND:
+                    handleGameSelected(requestObject);
+                    break;
+                case MessageCurrentStich.LAST:
+                    handleCurrentStich(requestObject);
+                    break;
+                case MessageSendCards.COMMAND:
+                    handleSendCards(requestObject);
+                    break;
+                case MessageGetArmut.COMMAND:
+                    handleGetArmut(requestObject);
+                    break;
+                case MessageSchweinExists.COMMAND:
+                    schwein = true;
+                    break;
+                case MessageCardsReturned.COMMAND:
+                    runGame(beginner);
+                    break;
             }
-            case MessageAddPlayer.COMMAND:
-                if (players.size() > 4) {
-                    players.get(spectator).setSpectator(true);
-                }
-                break;
-            case MessageReadyForNextRound.COMMAND:{
-                if(wait4NextRound){
-                    MessageReadyForNextRound messageReadyForNextRound = new MessageReadyForNextRound(requestObject);
-                    readyMap.put(messageReadyForNextRound.getPlayerNumber(), true);
-                    players.stream().filter(Player::isAdmin).forEach(p->p.queue(new MessageDisplayMessage(
-                            players.get(messageReadyForNextRound.getPlayerNumber()).getName()+ " ist bereit")));
-                }
-                if(readyMap.values().stream().allMatch(p-> p)){
-                    nextGame();
-                }
-                break;
-            }
-            case MessageGameSelected.COMMAND:{
-                if(wait4Gesund) {
-                    MessageGameSelected messageGameSelected = new MessageGameSelected(requestObject);
-                    gameSelection.put(messageGameSelected.getPlayerNumber(), messageGameSelected.getSelectedGame());
-                    if(messageGameSelected.getSelectedGame()==KOENIGE){
-                        send2All(new MessageDisplayMessage(
-                                Strings.getString(Strings.KOENIGE,
-                                players.get(messageGameSelected.getPlayerNumber()).getName())));
-                    }
-                }
-                if(gameSelection.keySet().size()>3){
-                    setGameToPlay(gameSelection);
-                }
-                else {
-                    StringBuilder s = new StringBuilder("Warte auf " + (4 -gameSelection.size())+ " Spieler");
-                    players.forEach(player -> {
-                        if (gameSelection.containsKey(player.getNumber())) {
-                            queueOut(player, new MessageDisplayMessage(s.toString()));
-                        }
-                    });
-                }
-                break;
-            }
-            case MessageSendCards.COMMAND:{
-                MessageSendCards messageSendCards = new MessageSendCards(requestObject);
-                armutCards = new ArrayList<>();
-                if(messageSendCards.getReceiver().equals(MessageSendCards.RICH)) {
-                    messageSendCards.getCards().forEach(card ->{
-                        card.trump = DokoCards.isTrumpf(card,selectedGame);
-                        armutCards.add(card);
-                    });
-                    askNextPlayer2GetArmut();
-                }
-                else if(messageSendCards.getReceiver().equals(MessageSendCards.POOR)){
-                    send2All(new MessageDisplayMessage(Strings.getString(Strings.ARMUT_RETURN,
-                            players.get(armutplayer).getName(),
-                            messageSendCards.getCards().stream().filter(card -> card.trump).count())));
-                    queueOut(players.get(armutplayer),
-                            requestObject);
-                    players2Ask = new ArrayList<>();
-                }
-                break;
-            }
-            case MessageGetArmut.COMMAND:{
-                MessageGetArmut messageGetArmut = new MessageGetArmut(requestObject);
-                if(messageGetArmut.getsArmut()){
-                    queueOut(players.get(messageGetArmut.getPlayerNumber()),
-                            new MessageSendCards(armutCards, MessageSendCards.RICH));
-                    players.get(messageGetArmut.getPlayerNumber()).setRe(true, "ist arm");
-                    players.stream().filter(player -> player.getNumber()!=messageGetArmut.getPlayerNumber())
-                            .collect(Collectors.toList()).forEach(player -> queueOut(player,new MessageDisplayMessage(
-                                    Strings.getString(Strings.ARMUT_ACCEPT,
-                                            players.get(messageGetArmut.getPlayerNumber()).getName()))));
-                }else{
-                    send2All(new MessageDisplayMessage(
-                            Strings.getString(Strings.ARMUT_REFUSE,
-                            players.get(messageGetArmut.getPlayerNumber()).getName())));
-                    askNextPlayer2GetArmut();
-                }
-                break;
-            }
-            case MessageSchweinExists.COMMAND:{
-                schwein = true;
-                break;
-            }
-            case MessageCurrentStich.LAST:{
-                if(stichList.size()>0) {
-                    try {
-                        MessageCurrentStich cs = new MessageCurrentStich(stichList.get(stichList.size()-1).getCardMap(), MessageCurrentStich.LAST);
-                        queueOut(players.get(new MessageCurrentStich(requestObject).getPlayerNumber()), cs);
-                    }
-                    catch (Exception ex){
-                        log.warn(ex.toString());
-                    }
-                }
-                break;
-            }
-            case MessageCardsReturned.COMMAND:
-                runGame(beginner);
-                break;
+        }catch (Exception ex){
+            log.error(ex.toString());
         }
     }
 
-    private void
-    handlePutCard(Message message) {
+    private void handleCurrentStich(Message requestObject) {
+        if (stichList.size() > 0) {
+            try {
+                MessageCurrentStich cs = new MessageCurrentStich(stichList.get(stichList.size() - 1).getCardMap(), MessageCurrentStich.LAST);
+                queueOut(players.get(new MessageCurrentStich(requestObject).getPlayerNumber()), cs);
+            } catch (Exception ex) {
+                log.warn(ex.toString());
+            }
+        }
+    }
+
+    private void handleGetArmut(Message requestObject) {
+        MessageGetArmut messageGetArmut = new MessageGetArmut(requestObject);
+        if (messageGetArmut.getsArmut()) {
+            queueOut(players.get(messageGetArmut.getPlayerNumber()),
+                    new MessageSendCards(armutCards, MessageSendCards.RICH));
+            players.get(messageGetArmut.getPlayerNumber()).setRe(true, "ist arm");
+            players.stream().filter(player -> player.getNumber() != messageGetArmut.getPlayerNumber())
+                    .collect(Collectors.toList()).forEach(player -> queueOut(player, new MessageDisplayMessage(
+                            Strings.getString(Strings.ARMUT_ACCEPT,
+                                    players.get(messageGetArmut.getPlayerNumber()).getName()))));
+        } else {
+            send2All(new MessageDisplayMessage(
+                    Strings.getString(Strings.ARMUT_REFUSE,
+                            players.get(messageGetArmut.getPlayerNumber()).getName())));
+            askNextPlayer2GetArmut();
+        }
+    }
+
+    private void handleSendCards(Message requestObject) {
+        MessageSendCards messageSendCards = new MessageSendCards(requestObject);
+        armutCards = new ArrayList<>();
+        if (messageSendCards.getReceiver().equals(MessageSendCards.RICH)) {
+            messageSendCards.getCards().forEach(card -> {
+                card.trump = DokoCards.isTrumpf(card, selectedGame);
+                armutCards.add(card);
+            });
+            askNextPlayer2GetArmut();
+        } else if (messageSendCards.getReceiver().equals(MessageSendCards.POOR)) {
+            send2All(new MessageDisplayMessage(Strings.getString(Strings.ARMUT_RETURN,
+                    players.get(armutplayer).getName(),
+                    messageSendCards.getCards().stream().filter(card -> card.trump).count())));
+            queueOut(players.get(armutplayer),
+                    requestObject);
+            players2Ask = new ArrayList<>();
+        }
+    }
+
+    private void handleGameSelected(Message requestObject) {
+        if (wait4Gesund) {
+            MessageGameSelected messageGameSelected = new MessageGameSelected(requestObject);
+            gameSelection.put(messageGameSelected.getPlayerNumber(), messageGameSelected.getSelectedGame());
+            if (messageGameSelected.getSelectedGame() == KOENIGE) {
+                send2All(new MessageDisplayMessage(
+                        Strings.getString(Strings.KOENIGE,
+                                players.get(messageGameSelected.getPlayerNumber()).getName())));
+            }
+        }
+        if (gameSelection.keySet().size() > 3) {
+            setGameToPlay(gameSelection);
+        } else {
+            StringBuilder s = new StringBuilder("Warte auf " + (4 - gameSelection.size()) + " Spieler");
+            players.forEach(player -> {
+                if (gameSelection.containsKey(player.getNumber())) {
+                    queueOut(player, new MessageDisplayMessage(s.toString()));
+                }
+            });
+        }
+    }
+
+
+    @Override
+    protected void handlePutCard(Message message) {
         MessagePutCard messagePutCard = new MessagePutCard(message);
 
         if (stich == null || stich.getCardMap().size() > 3) {
             stich = new Stich(players, currentStichNumber, selectedGame,c.doko);
             currentStichNumber++;
         }
-        BaseCard card = messagePutCard.getCard();
+        BaseCard card = messagePutCard.getCard(Statics.game.DOKO);
         card.trump = DokoCards.isTrumpf(card,selectedGame);
-        stich.addCard(players.get(currentPlayer), card);
-        players.get(currentPlayer).removeCard(messagePutCard.getCard());
+        stich.addCard(players.get(messagePutCard.getPlayerNumber()), card);
+        players.get(messagePutCard.getPlayerNumber()).removeCard(card);
         send2All(message);
         currentPlayer++;
         if(currentPlayer==spectator){
@@ -260,20 +223,16 @@ public class DokoServer extends BaseServer{
     }
 
 
-    private int getTrumpfCardCount(JsonObject object) {
-        JsonArray array = object.get("cards").getAsJsonArray();
-        List<BaseCard> cardList = new ArrayList<>();
-        for(JsonElement element: array){
-            String cardString = element.getAsString();
-            BaseCard card = new BaseCard(cardString.split(" ")[1],
-                    cardString.split(" ")[0],false);
-            card.trump = DokoCards.isTrumpf(card,selectedGame);
-            cardList.add(card);
-        }
-        return ((int)cardList.stream().filter(card -> card.trump).count());
+    @Override
+    protected void runGame(int player){
+        super.runGame(player);
+        aufspieler = -1;
+        send2All(new MessageGameType(selectedGame));
+        send2All(new MessageWait4Player(players.stream().filter(p -> p.getNumber()==player).findAny().get().getName()));
     }
 
-    private void nextGame() {
+    @Override
+     protected void nextGame() {
         if(selectedGame==NORMAL
                 ||selectedGame==ARMUT){
             beginner++;
@@ -445,7 +404,7 @@ public class DokoServer extends BaseServer{
         }
         stichList = new ArrayList<>();
         random = new Random(System.currentTimeMillis());
-        List<BaseCard> cardList = DokoCards.createCardList();
+        List<BaseCard> cardList = new ArrayList<>(DokoCards.ALL_CARDS);
 
         players.forEach(player -> {
             player.setHand(new ArrayList<>());
@@ -523,7 +482,4 @@ public class DokoServer extends BaseServer{
         super.updateReconnectedPlayer(player);
     }
 
-    public Stich getStich(int stichNumber) {
-        return stichList.get(stichNumber);
-    }
 }

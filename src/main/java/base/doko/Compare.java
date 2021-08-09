@@ -6,6 +6,7 @@ import base.Statics;
 import base.doko.messages.MessageGameSelected;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Compare {
@@ -36,9 +37,10 @@ public class Compare {
 
     private static BaseCard getWinnerForSameColor(BaseCard first, BaseCard second, MessageGameSelected.GAMES game) {
         List<BaseCard> list = new ArrayList<>();
-        DokoCards.createCardListBySuit(first.suit, game);
+        //DokoCards.createCardListBySuit(first.suit, game);
         return null;
     }
+
 
     public static BaseCard normalGame (BaseCard first, BaseCard second, boolean schwein) {
         switch (first.suit) {
@@ -1681,4 +1683,22 @@ public class Compare {
         return second;
     }
 
+    public static Comparator<BaseCard> getComparer(MessageGameSelected.GAMES game) {
+        Comparator<BaseCard> comparator = new Comparator<BaseCard>() {
+            @Override
+            public int compare(BaseCard o1, BaseCard o2) {
+                switch (game){
+                    case NORMAL:
+                        if(o1==normalGame(o1,o2,true)){
+                            return 1;
+                        }
+                        else{
+                            return -1;
+                        }
+                }
+                return 0;
+            }
+        };
+        return comparator;
+    }
 }

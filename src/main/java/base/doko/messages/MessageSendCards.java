@@ -1,6 +1,8 @@
 package base.doko.messages;
 
 import base.BaseCard;
+import base.DokoConfig;
+import base.doko.DokoCards;
 import base.messages.Message;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -16,8 +18,7 @@ public class MessageSendCards extends Message {
     public MessageSendCards(List<BaseCard> cards, String receiver) {
         this.command = COMMAND;
         JsonArray array = new JsonArray();
-        cards.forEach(card ->  array.add(card.toString()));
-        this.params = new JsonObject();
+        cards.forEach(card ->  array.add(card.cardNumber));
         this.params.add("cards",array);
         this.params.addProperty("receiver",receiver);
     }
@@ -30,9 +31,7 @@ public class MessageSendCards extends Message {
     public List<BaseCard> getCards(){
         List<BaseCard> list = new ArrayList<>();
         this.params.get("cards").getAsJsonArray().forEach(j->{
-            list.add(new BaseCard(j.getAsString().split(" ")[1],
-                    j.getAsString().split(" ")[0],
-                    false));
+            list.add(DokoCards.ALL_CARDS.get(j.getAsInt()));
         });
         return list;
     }
