@@ -23,8 +23,8 @@ public class Strings {
     ));
 
     public final static List<String> KOENIGE = new ArrayList<>(Arrays.asList(
-            "%s hat mehr als 5 Könige",
-            "%s hat zu viele Könige"
+            "%s hat mehr als 5 Koenige",
+            "%s hat zu viele Koenige"
     ));
 
     public final static List<String> ARMUT_REFUSE = new ArrayList<>(Arrays.asList(
@@ -37,9 +37,9 @@ public class Strings {
     ));
 
     public final static List<String> ARMUT_RETURN = new ArrayList<>(Arrays.asList(
-            "%s bekommt %s Trumpf zurück",
-            "%s erhält %s Trumpf zurück",
-            "An %s gehen %s Trumpf zurück"
+            "%s bekommt %s Trumpf zurueck",
+            "%s erhaelt %s Trumpf zurueck",
+            "An %s gehen %s Trumpf zurueck"
     ));
 
     public final static List<String> NEU_GEBEN = new ArrayList<>(Arrays.asList(
@@ -49,7 +49,7 @@ public class Strings {
     ));
 
     public static final List<String> HOCHZEIT = new ArrayList<>(Arrays.asList(
-            "%s möchte heiraten",
+            "%s moechte heiraten",
             "%s will Hochzeit feiern"
     ));
 

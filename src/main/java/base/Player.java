@@ -11,7 +11,7 @@ public class Player {
     private final int number;
     private transient Socket socket;
     private boolean spectator;
-    private List<BaseCard> hand;
+    private List<Card> hand;
     private boolean re;
     private int points;
     private boolean admin;
@@ -94,11 +94,11 @@ public class Player {
         this.spectator = spectator;
     }
 
-    public List<BaseCard> getHand() {
+    public List<Card> getHand() {
         return hand;
     }
 
-    public void setHand(List<BaseCard> hand) {
+    public void setHand(List<Card> hand) {
         this.hand = hand;
     }
 
@@ -139,7 +139,7 @@ public class Player {
     }
 
     public boolean hasCard(String farbe, String value){
-        for (BaseCard card : hand) {
+        for (Card card : hand) {
             if (card.suit.equals(farbe) && card.kind.equals(value)) {
                 return true;
             }
@@ -178,7 +178,7 @@ public class Player {
                 .ifPresent(baseCard -> hand.remove(baseCard));
     }
 
-    public void removeCard(BaseCard card){
+    public void removeCard(Card card){
         removeCard(card.suit,card.kind);
     }
 }

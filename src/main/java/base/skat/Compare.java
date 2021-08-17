@@ -1,27 +1,27 @@
 package base.skat;
 
-import base.BaseCard;
+import base.Card;
 import base.Statics;
 
 public class Compare {
 
-    public static BaseCard karo (BaseCard first, BaseCard second){
+    public static Card karo (Card first, Card second){
         return farbSolo(first,second);
     }
 
-    public static BaseCard herz (BaseCard first, BaseCard second){
+    public static Card herz (Card first, Card second){
         return farbSolo(first,second);
     }
 
-    public static BaseCard pik (BaseCard first, BaseCard second){
+    public static Card pik (Card first, Card second){
         return farbSolo(first,second);
     }
 
-    public static BaseCard kreuz (BaseCard first, BaseCard second){
+    public static Card kreuz (Card first, Card second){
         return farbSolo(first,second);
     }
 
-    public static BaseCard farbSolo(BaseCard first, BaseCard second) {
+    public static Card farbSolo(Card first, Card second) {
         if (first.trump && !second.trump) {
             return first;
         } else if (!first.trump && second.trump) {
@@ -90,7 +90,7 @@ public class Compare {
         return first;
     }
 
-    public static BaseCard grand (BaseCard first, BaseCard second){
+    public static Card grand (Card first, Card second){
         if(first.kind.equals(Statics.BUBE)&&second.kind.equals(Statics.BUBE)){
             return getWinnerBuben(first,second);
         }
@@ -105,7 +105,7 @@ public class Compare {
         }
     }
 
-    public static BaseCard nullspiel(BaseCard first, BaseCard second){
+    public static Card nullspiel(Card first, Card second){
         if(first.suit.equals(second.suit)) {
             switch (first.kind) {
                 case Statics.SIEBEN:
@@ -159,7 +159,7 @@ public class Compare {
         return first;
     }
 
-    private static BaseCard getWinnerForSameColor(BaseCard first, BaseCard second) {
+    private static Card getWinnerForSameColor(Card first, Card second) {
         if(first.suit.equals(second.suit)){
             switch (first.kind) {
                 case Statics.SIEBEN:
@@ -205,7 +205,7 @@ public class Compare {
         return first;
     }
 
-    private static BaseCard getWinnerBuben(BaseCard first, BaseCard second) {
+    private static Card getWinnerBuben(Card first, Card second) {
         switch (first.suit) {
             case Statics.KREUZ:
                 return first;

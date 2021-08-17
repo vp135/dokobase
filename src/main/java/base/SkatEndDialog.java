@@ -26,7 +26,7 @@ public class SkatEndDialog {
     private final MessageGameSelected.GAMES game;
     private JDialog d;
 
-    public SkatEndDialog(MessageGameSelected.GAMES game, List<Player> players, List<Stich> stichList, List<BaseCard> skat){
+    public SkatEndDialog(MessageGameSelected.GAMES game, List<Player> players, List<Stich> stichList, List<Card> skat){
         this.game = game;
         this.players = players;
         this.stichList = stichList;
@@ -221,9 +221,9 @@ public class SkatEndDialog {
         }
     }
 
-    private static int getSkatPoints(List<BaseCard> skat){
+    private static int getSkatPoints(List<Card> skat){
         int result = 0;
-        for(BaseCard c : skat) {
+        for(Card c : skat) {
             switch (c.kind) {
                 case Statics.ZEHN: {
                     result += 10;

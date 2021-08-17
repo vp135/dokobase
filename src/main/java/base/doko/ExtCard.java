@@ -1,13 +1,13 @@
 package base.doko;
 
-import base.BaseCard;
+import base.Card;
 
-public class ExtCard extends BaseCard {
+public class ExtCard extends Card {
 
     private int state;
     private boolean hand;
 
-    public ExtCard (BaseCard card){
+    public ExtCard (Card card){
         super(card.kind, card.suit, 0,0);
         this.state =0;
     }

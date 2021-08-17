@@ -1,6 +1,6 @@
 package base.messages;
 
-import base.BaseCard;
+import base.Card;
 import base.Statics;
 import base.doko.DokoCards;
 import base.doko.messages.MessageGameSelected;
@@ -14,7 +14,7 @@ public class MessageCards extends Message {
 
     public final static String COMMAND ="Cards";
 
-    public MessageCards(List<BaseCard> cardList) {
+    public MessageCards(List<Card> cardList) {
         this.command = COMMAND;
         JsonArray array = new JsonArray();
         cardList.forEach(p->array.add(p.cardNumber));
@@ -27,12 +27,12 @@ public class MessageCards extends Message {
     }
 
 
-    public List<BaseCard> getCards(Statics.game game){
-        List<BaseCard> list = new ArrayList<>();
+    public List<Card> getCards(Statics.game game){
+        List<Card> list = new ArrayList<>();
         this.params.get("cards").getAsJsonArray().forEach(j->{
             switch (game) {
                 case DOKO:
-                    BaseCard card = DokoCards.ALL_CARDS.get(j.getAsInt());
+                    Card card = DokoCards.ALL_CARDS.get(j.getAsInt());
                     card.trump = DokoCards.isTrumpf(card, MessageGameSelected.GAMES.NORMAL);
                     list.add(card);
                     break;
@@ -40,7 +40,7 @@ public class MessageCards extends Message {
                     list.add(SkatCards.ALL_CARDS.get(j.getAsInt()));
                     break;
                 default:
-                    list.add(new BaseCard(Statics.DAME,Statics.KARO,-1,0));
+                    list.add(new Card(Statics.DAME,Statics.KARO,-1,0));
                     break;
             }
         });

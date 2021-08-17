@@ -10,4 +10,13 @@ public class MessagePassen extends Message {
         this.command = COMMAND;
         this.params.addProperty("player",player);
     }
+
+    public MessagePassen(Message message) {
+        this.command = COMMAND;
+        this.params = message.getParams();
+    }
+
+    public String getPlayerName() {
+        return params.get("player").getAsString();
+    }
 }

@@ -16,7 +16,12 @@ public class MessageReizen extends Message {
         this.params.addProperty("active", active);
     }
 
-    public String getPlayer(){
+    public MessageReizen(Message message){
+        this.command = COMMAND;
+        this.params = message.getParams();
+    }
+
+    public String getPlayerName(){
         return this.params.get("player").getAsString();
     }
 

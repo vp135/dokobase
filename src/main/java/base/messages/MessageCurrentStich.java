@@ -1,7 +1,6 @@
 package base.messages;
 
-import base.BaseCard;
-import base.DokoConfig;
+import base.Card;
 import base.Statics;
 import base.doko.DokoCards;
 import base.skat.SkatCards;
@@ -17,13 +16,13 @@ public class MessageCurrentStich extends Message {
     public final static String SPECIFIC = "SpecificStich";
 
 
-    public MessageCurrentStich(Map<BaseCard, Integer> map){
+    public MessageCurrentStich(Map<Card, Integer> map){
         this.command = CURRENT;
         this.params = new JsonObject();
         map.keySet().forEach(p-> this.params.addProperty(map.get(p).toString(),p.cardNumber));
     }
 
-    public MessageCurrentStich(Map<BaseCard, Integer> map, int player, boolean isLast) {
+    public MessageCurrentStich(Map<Card, Integer> map, int player, boolean isLast) {
         this(map);
         this.params.addProperty("player",player);
         if (isLast){
@@ -31,8 +30,8 @@ public class MessageCurrentStich extends Message {
         }
     }
 
-    public MessageCurrentStich(Map<BaseCard, Integer> map, String command){
-        Map<BaseCard, Integer> baseMap = new HashMap<>();
+    public MessageCurrentStich(Map<Card, Integer> map, String command){
+        Map<Card, Integer> baseMap = new HashMap<>();
         map.keySet().forEach(key-> baseMap.put(key,map.get(key)));
         this.command = command;
         this.params = new JsonObject();
@@ -44,8 +43,8 @@ public class MessageCurrentStich extends Message {
         this.params = message.getParams();
     }
 
-    public Map<Integer,BaseCard> GetStichMap(Statics.game game) {
-        Map<Integer, BaseCard> map = new HashMap<>();
+    public Map<Integer, Card> GetStichMap(Statics.game game) {
+        Map<Integer, Card> map = new HashMap<>();
         switch (game) {
             case DOKO:
                 params.keySet().forEach(k -> map.put(Integer.parseInt(k), DokoCards.ALL_CARDS.get(params.get(k).getAsInt())));

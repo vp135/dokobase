@@ -1,9 +1,9 @@
 package base;
 
 import base.doko.DokoCards;
-import base.messages.*;
 import base.doko.Stich;
 import base.doko.messages.*;
+import base.messages.*;
 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -23,10 +23,9 @@ public class DokoServer extends BaseServer{
     private MessageGameSelected.GAMES selectedGame = NORMAL;
 
 
-
     private boolean wait4Gesund = false;
     private boolean schwein = false;
-    private List<BaseCard> armutCards;
+    private List<Card> armutCards;
     private HashMap<Integer, MessageGameSelected.GAMES> gameSelection = new HashMap<>();
     private int aufspieler = -1;
     private int armutplayer = -1;
@@ -76,6 +75,7 @@ public class DokoServer extends BaseServer{
         }
     }
 
+
     private void handleCurrentStich(Message requestObject) {
         if (stichList.size() > 0) {
             try {
@@ -86,6 +86,7 @@ public class DokoServer extends BaseServer{
             }
         }
     }
+
 
     private void handleGetArmut(Message requestObject) {
         MessageGetArmut messageGetArmut = new MessageGetArmut(requestObject);
@@ -105,6 +106,7 @@ public class DokoServer extends BaseServer{
         }
     }
 
+
     private void handleSendCards(Message requestObject) {
         MessageSendCards messageSendCards = new MessageSendCards(requestObject);
         armutCards = new ArrayList<>();
@@ -123,6 +125,7 @@ public class DokoServer extends BaseServer{
             players2Ask = new ArrayList<>();
         }
     }
+
 
     private void handleGameSelected(Message requestObject) {
         if (wait4Gesund) {
@@ -155,7 +158,7 @@ public class DokoServer extends BaseServer{
             stich = new Stich(players, currentStichNumber, selectedGame,c.doko);
             currentStichNumber++;
         }
-        BaseCard card = messagePutCard.getCard(Statics.game.DOKO);
+        Card card = messagePutCard.getCard(Statics.game.DOKO);
         card.trump = DokoCards.isTrumpf(card,selectedGame);
         stich.addCard(players.get(messagePutCard.getPlayerNumber()), card);
         players.get(messagePutCard.getPlayerNumber()).removeCard(card);
@@ -210,6 +213,7 @@ public class DokoServer extends BaseServer{
         }
     }
 
+
     @Override
     public void endIt() {
         super.endIt();
@@ -227,9 +231,10 @@ public class DokoServer extends BaseServer{
     protected void runGame(int player){
         super.runGame(player);
         aufspieler = -1;
-        send2All(new MessageGameType(selectedGame));
+        send2All(new MessageGameSelected(player,selectedGame));
         send2All(new MessageWait4Player(players.stream().filter(p -> p.getNumber()==player).findAny().get().getName()));
     }
+
 
     @Override
      protected void nextGame() {
@@ -386,7 +391,7 @@ public class DokoServer extends BaseServer{
             aufspieler=-1;
             for(Integer i :selection.keySet()) {
                 if(selection.get(i).equals(HOCHZEIT)){
-                    players.get(i).setRe(true, "möchte heiraten");
+                    players.get(i).setRe(true, "moechte heiraten");
                     send2All(new MessageDisplayMessage(Strings.getString(Strings.HOCHZEIT,players.get(i).getName())));
                     hochzeitSpieler = i;
                     break;
@@ -404,33 +409,38 @@ public class DokoServer extends BaseServer{
         }
         stichList = new ArrayList<>();
         random = new Random(System.currentTimeMillis());
-        List<BaseCard> cardList = new ArrayList<>(DokoCards.ALL_CARDS);
-
-        players.forEach(player -> {
-            player.setHand(new ArrayList<>());
-            if(!player.isSpectator()) {
-                for (int i = 0; i < 10; i++) {
-                    BaseCard card = cardList.get(random.nextInt(cardList.size()));
-                    player.getHand().add(card);
-                    cardList.remove(card);
-                }
-            }
-        });
-
+        boolean ok = shuffle(new ArrayList<>(DokoCards.ALL_CARDS));
+        while (!ok) {
+            ok = shuffle(new ArrayList<>(DokoCards.ALL_CARDS));
+        }
         for (Player player : players) {
             if (!player.isSpectator()) {
                 MessageCards cards = new MessageCards(player.getHand());
                 queueOut(player, cards);
             }
         }
-
         wait4Gesund = true;
-        armutplayer =-1;
+        armutplayer = -1;
         schwein = false;
         stich = null;
         gameSelection = new HashMap<>();
         send2All(new MessageSelectGame());
     }
+
+    private boolean shuffle(List<Card> cardList) {
+        players.forEach(player -> {
+            player.setHand(new ArrayList<>());
+            if(!player.isSpectator()) {
+                for (int i = 0; i < 10; i++) {
+                    Card card = cardList.get(random.nextInt(cardList.size()));
+                    player.getHand().add(card);
+                    cardList.remove(card);
+                }
+            }
+        });
+        return true;
+    }
+
 
     @Override
     public void startGame() {
@@ -459,13 +469,13 @@ public class DokoServer extends BaseServer{
         player.getOutMessages().addFirst(new MessageAnnounceSpectator(spectator,aufspieler));
         player.getOutMessages().addFirst(new MessageCards(player.getHand()));
         player.getOutMessages().addFirst(new MessageStartGame(gameType.name()));
-        player.queue(new MessageGameType(selectedGame));
+        player.queue(new MessageGameSelected(player.getNumber(),selectedGame));
         List<String> playerList = new ArrayList<>();
         players.forEach(p->playerList.add(p.getName()));
         player.queue(MessagePlayerList.playersInLobby(playerList));
         if(stich!=null) {
             stich.getCardMap().keySet().forEach(baseCard -> {
-                player.queue(new MessagePutCard(stich.getCardMap().get(baseCard), baseCard.suit, baseCard.kind));
+                player.queue(new MessagePutCard(stich.getCardMap().get(baseCard), baseCard));
             });
         }
         if(wait4Gesund){

@@ -9,7 +9,7 @@ public class MessageSelectCards4Armut extends Message {
     public MessageSelectCards4Armut() {
         this.command =COMMAND;
         this.params = new JsonObject();
-        this.params.addProperty("message","Alle Trümpfe auswählen");
+        this.params.addProperty("message","Alle Truempfe auswaehlen");
 
     }
 

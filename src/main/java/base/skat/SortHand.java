@@ -1,6 +1,6 @@
 package base.skat;
 
-import base.BaseCard;
+import base.Card;
 import base.Statics;
 import base.skat.messages.MessageGameSelected;
 
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class SortHand {
 
-    public static List<BaseCard> sort(List<BaseCard> list, MessageGameSelected.GAMES order){
+    public static List<Card> sort(List<Card> list, MessageGameSelected.GAMES order){
         switch (order){
             case Karo:
                 return sortKaro(list);
@@ -31,13 +31,13 @@ public class SortHand {
         }
     }
 
-    public static List<BaseCard> sortGrand(List<BaseCard> list_orig) {
+    public static List<Card> sortGrand(List<Card> list_orig) {
         return sortKreuz(list_orig);
     }
 
-    public static List<BaseCard> sortKreuz(List<BaseCard> list_orig) {
-        List<BaseCard> list = new ArrayList<>(list_orig);
-        List<BaseCard> outList = new ArrayList<>();
+    public static List<Card> sortKreuz(List<Card> list_orig) {
+        List<Card> list = new ArrayList<>(list_orig);
+        List<Card> outList = new ArrayList<>();
         sortBuben(list, outList);
         sortColor(list,outList,Statics.KREUZ);
         sortColor(list,outList,Statics.PIK);
@@ -46,9 +46,9 @@ public class SortHand {
         return outList;
     }
 
-    public static List<BaseCard> sortPik(List<BaseCard> list_orig) {
-        List<BaseCard> list = new ArrayList<>(list_orig);
-        List<BaseCard> outList = new ArrayList<>();
+    public static List<Card> sortPik(List<Card> list_orig) {
+        List<Card> list = new ArrayList<>(list_orig);
+        List<Card> outList = new ArrayList<>();
         sortBuben(list, outList);
         sortColor(list,outList,Statics.PIK);
         sortColor(list,outList,Statics.KREUZ);
@@ -57,9 +57,9 @@ public class SortHand {
         return outList;
     }
 
-    public static List<BaseCard> sortHerz(List<BaseCard> list_orig) {
-        List<BaseCard> list = new ArrayList<>(list_orig);
-        List<BaseCard> outList = new ArrayList<>();
+    public static List<Card> sortHerz(List<Card> list_orig) {
+        List<Card> list = new ArrayList<>(list_orig);
+        List<Card> outList = new ArrayList<>();
         sortBuben(list, outList);
         sortColor(list,outList,Statics.HERZ);
         sortColor(list,outList,Statics.KREUZ);
@@ -68,9 +68,9 @@ public class SortHand {
         return outList;
     }
 
-    public static List<BaseCard> sortKaro(List<BaseCard> list_orig) {
-        List<BaseCard> list = new ArrayList<>(list_orig);
-        List<BaseCard> outList = new ArrayList<>();
+    public static List<Card> sortKaro(List<Card> list_orig) {
+        List<Card> list = new ArrayList<>(list_orig);
+        List<Card> outList = new ArrayList<>();
         sortBuben(list, outList);
         sortColor(list,outList,Statics.KARO);
         sortColor(list,outList,Statics.KREUZ);
@@ -79,9 +79,9 @@ public class SortHand {
         return outList;
     }
 
-    public static List<BaseCard> sortNull(List<BaseCard> list_orig) {
-        List<BaseCard> list = new ArrayList<>(list_orig);
-        List<BaseCard> outList = new ArrayList<>();
+    public static List<Card> sortNull(List<Card> list_orig) {
+        List<Card> list = new ArrayList<>(list_orig);
+        List<Card> outList = new ArrayList<>();
         sortColorNull(list,outList,Statics.KREUZ);
         sortColorNull(list,outList,Statics.PIK);
         sortColorNull(list,outList,Statics.HERZ);
@@ -92,9 +92,9 @@ public class SortHand {
     //helper functions
 
 
-    private static void sortBuben(List<BaseCard> list, List<BaseCard> returnList) {
-        List<BaseCard> bubenList = list.stream().filter(c-> c.kind.equals(Statics.BUBE)).collect(Collectors.toList());
-        Optional<BaseCard> card = bubenList.stream().filter(c->c.suit.equals(Statics.KREUZ)).findFirst();
+    private static void sortBuben(List<Card> list, List<Card> returnList) {
+        List<Card> bubenList = list.stream().filter(c-> c.kind.equals(Statics.BUBE)).collect(Collectors.toList());
+        Optional<Card> card = bubenList.stream().filter(c->c.suit.equals(Statics.KREUZ)).findFirst();
         if(card.isPresent()){
             returnList.add(card.get());
             bubenList.remove(card.get());
@@ -121,7 +121,7 @@ public class SortHand {
     }
 
 
-    private static void sortColor(List<BaseCard> list, List<BaseCard> outList, String farbe) {
+    private static void sortColor(List<Card> list, List<Card> outList, String farbe) {
         List<String> order = Arrays.asList(
                 Statics.ASS,
                 Statics.ZEHN,
@@ -130,9 +130,9 @@ public class SortHand {
                 Statics.NEUN,
                 Statics.ACHT,
                 Statics.SIEBEN);
-        List<BaseCard> farbList = list.stream().filter(c-> c.suit.equals(farbe)).collect(Collectors.toList());
+        List<Card> farbList = list.stream().filter(c-> c.suit.equals(farbe)).collect(Collectors.toList());
         order.forEach(pos->{
-            Optional<BaseCard> card = farbList.stream().filter(c->c.kind.equals(pos)).findFirst();
+            Optional<Card> card = farbList.stream().filter(c->c.kind.equals(pos)).findFirst();
             if(card.isPresent()) {
                 outList.add(card.get());
                 farbList.remove(card.get());
@@ -141,7 +141,7 @@ public class SortHand {
         });
     }
 
-    private static void sortColorNull(List<BaseCard> list, List<BaseCard> outList, String farbe) {
+    private static void sortColorNull(List<Card> list, List<Card> outList, String farbe) {
         List<String> order = Arrays.asList(
                 Statics.ASS,
                 Statics.KOENIG,
@@ -151,9 +151,9 @@ public class SortHand {
                 Statics.NEUN,
                 Statics.ACHT,
                 Statics.SIEBEN);
-        List<BaseCard> farbList = list.stream().filter(c-> c.suit.equals(farbe)).collect(Collectors.toList());
+        List<Card> farbList = list.stream().filter(c-> c.suit.equals(farbe)).collect(Collectors.toList());
         order.forEach(pos->{
-            Optional<BaseCard> card = farbList.stream().filter(c->c.kind.equals(pos)).findFirst();
+            Optional<Card> card = farbList.stream().filter(c->c.kind.equals(pos)).findFirst();
             if(card.isPresent()) {
                 outList.add(card.get());
                 farbList.remove(card.get());

@@ -25,7 +25,7 @@ public class SkatServer extends BaseServer{
     private boolean hand;
     private boolean ouvert;
     private int currentGameValue = 0;
-    private List<BaseCard> skat;
+    private List<Card> skat;
     private int nextRamschPlayer;
     private int gamesTilRamsch;
     private int gamesTilNormal;
@@ -80,8 +80,9 @@ public class SkatServer extends BaseServer{
     }
 
     private void handleGrandHand(Message message) {
-        Player player =  players.stream().filter(p->p.getName().equals(message.getParams().get("player").getAsString())).findFirst().get();
-        if(message.getParams().get("grandHand").getAsBoolean()){
+        MessageGrandHand messageGrandHand = new MessageGrandHand(message);
+        Player player =  players.stream().filter(p->p.getName().equals(messageGrandHand.getPlayerName())).findFirst().get();
+        if(messageGrandHand.getGrandHand()){
             selectedGame = MessageGameSelected.GAMES.Grand;
             send2All(new MessageGameSelected(player.getName(),selectedGame,true,false));
             hand = true;
@@ -202,10 +203,11 @@ public class SkatServer extends BaseServer{
     }
 
     private void handleGameSelected(Message message) {
-        String player = message.getParams().get("player").getAsString();
-        selectedGame = MessageGameSelected.GAMES.valueOf(message.getParams().get("game").getAsString());
-        hand = message.getParams().get("hand").getAsBoolean();
-        ouvert = message.getParams().get("ouvert").getAsBoolean();
+        MessageGameSelected messageGameSelected = new MessageGameSelected(message);
+        String player = messageGameSelected.getPlayerName();
+        selectedGame = messageGameSelected.getSelectedGame();
+        hand = messageGameSelected.gethand();
+        ouvert = messageGameSelected.getOuvert();
         send2All(message);
         send2All(new MessageDisplayMessage(player +" spielt " +selectedGame.name()
                 + (hand ? " hand":"" )+ (ouvert ? " ouvert":"")));
@@ -221,7 +223,8 @@ public class SkatServer extends BaseServer{
     }
 
     private void handleSchieben(Message message) {
-        send2All(new MessageDisplayMessage(String.format("%s schiebt",message.getParams().get("player").getAsString())));
+        MessageSchieben messageSchieben = new MessageSchieben(message);
+        send2All(new MessageDisplayMessage(String.format("%s schiebt",messageSchieben.getPlayerName())));
         log.info("asking nextRamsch because Schieben");
         askNextRamschPlayer();
     }
@@ -239,23 +242,28 @@ public class SkatServer extends BaseServer{
     }
 
 
-
     private void askNextRamschPlayer() {
         state = RAMSCH;
         if(nextRamschPlayer==hoeren){
-            nextRamschPlayer= sagen;
             queueOut(players.get(nextRamschPlayer),new MessageRamschSkat());
             players.get(nextRamschPlayer).state = Player.PLAYER_STATE.SELECTING_CARDS_RAMSCH;
+            nextRamschPlayer= sagen;
         }
         else if(nextRamschPlayer == sagen){
-            nextRamschPlayer= weitersagen;
             queueOut(players.get(nextRamschPlayer),new MessageRamschSkat());
             players.get(nextRamschPlayer).state = Player.PLAYER_STATE.SELECTING_RAMSCH;
+            nextRamschPlayer= weitersagen;
+        }
+        else if(nextRamschPlayer == weitersagen){
+            queueOut(players.get(nextRamschPlayer),new MessageRamschSkat());
+            players.get(nextRamschPlayer).state = Player.PLAYER_STATE.SELECTING_RAMSCH;
+            nextRamschPlayer =-1;
         }
         else{
             runGame(beginner);
         }
     }
+
 
     private void askNextGrandHandPlayer() {
         state = GRAND_HAND;
@@ -274,20 +282,23 @@ public class SkatServer extends BaseServer{
     }
 
     private void handleGetSkat(Message message) {
-        queueOut(players.stream().filter(player -> player.getName().equals(message.getParams().get("player").getAsString())).findFirst().get(),
+        MessageSkatCards messageSkatCards = new MessageSkatCards(message);
+        queueOut(players.stream().filter(player -> player.getName()
+                        .equals(messageSkatCards.getPlayerName())).findFirst().get(),
                 MessageSkatCards.SkatCards("server",skat));
-        send2All(new MessageDisplayMessage(players.stream().filter(player -> player.getName().equals(message.getParams()
-                .get("player").getAsString())).findFirst().get().getName() + " nimmt den Skat auf"));
-        players.stream().filter(player -> player.getName().equals(message.getParams()
-                .get("player").getAsString())).findFirst().get().getHand().addAll(skat);
+        send2All(new MessageDisplayMessage(players.stream().filter(player -> player.getName()
+                .equals(messageSkatCards.getPlayerName())).findFirst().get().getName() + " nimmt den Skat auf"));
+        players.stream().filter(player -> player.getName()
+                .equals(messageSkatCards.getPlayerName())).findFirst().get().getHand().addAll(skat);
         skat.clear();
-        players.stream().filter(player -> player.getName().equals(message.getParams()
-                .get("player").getAsString())).findFirst().get().state = Player.PLAYER_STATE.SELECTING_CARDS_GAME;
+        players.stream().filter(player -> player.getName().equals(messageSkatCards.getPlayerName()))
+                .findFirst().get().state = Player.PLAYER_STATE.SELECTING_CARDS_GAME;
     }
 
     private void handlePassen(Message message) {
-        send2All(new MessageDisplayMessage(message.getParams().get("player").getAsString() + ": weg"));
-        Optional<Player> player = players.stream().filter(p-> p.getName().equals(message.getParams().get("player").getAsString())).findFirst();
+        MessagePassen messagePassen = new MessagePassen(message);
+        send2All(new MessageDisplayMessage(messagePassen.getPlayerName() + ": weg"));
+        Optional<Player> player = players.stream().filter(p-> p.getName().equals(messagePassen.getPlayerName())).findFirst();
         if(player.isPresent()){
             int p = player.get().getNumber();
             if(p==hoeren){
@@ -351,15 +362,15 @@ public class SkatServer extends BaseServer{
     }
 
     private void handleReizen(Message message) {
-        Optional<Player> player = players.stream().filter(p-> p.getName().equals(message.getParams().get("player")
-                .getAsString())).findFirst();
+        MessageReizen messageReizen = new MessageReizen(message);
+        Optional<Player> player = players.stream().filter(p-> p.getName().equals(messageReizen.getPlayerName())).findFirst();
         if(player.isPresent()) {
             int p = player.get().getNumber();
-            if (message.getParams().get("active").getAsBoolean()) {
-                currentGameValue = message.getParams().get("value").getAsInt();
+            if (messageReizen.isActive()) {
+                currentGameValue = messageReizen.getValue();
                 send2All(new MessageDisplayMessage(
                         String.format("%s: %s",
-                                message.getParams().get("player").getAsString(),
+                                messageReizen.getPlayerName(),
                                 currentGameValue)));
                 if (p == hoeren) {
                     selectGame(hoeren);
@@ -375,7 +386,7 @@ public class SkatServer extends BaseServer{
             } else {
                 send2All(new MessageDisplayMessage(
                         String.format("%s: %s",
-                                message.getParams().get("player").getAsString(),
+                                messageReizen.getPlayerName(),
                                 "Ja")));
                 if (p == hoeren) {
                     if(sagen<0){
@@ -399,14 +410,14 @@ public class SkatServer extends BaseServer{
         try {
             stichList = new ArrayList<>();
             random = new Random(System.currentTimeMillis());
-            List<BaseCard> cardList = new ArrayList<>(SkatCards.ALL_CARDS);
+            List<Card> cardList = new ArrayList<>(SkatCards.ALL_CARDS);
 
             players.forEach(player -> {
                 player.setHand(new ArrayList<>());
                 player.setPoints(0);
                 if (!player.isSpectator()) {
                     for (int i = 0; i < 10; i++) {
-                        BaseCard card = cardList.get(random.nextInt(cardList.size()));
+                        Card card = cardList.get(random.nextInt(cardList.size()));
                         player.getHand().add(card);
                         cardList.remove(card);
                     }
@@ -524,15 +535,15 @@ public class SkatServer extends BaseServer{
         player.queue(MessagePlayerList.playersInLobby(playerList));
         if(stich!=null) {
             stich.getBaseCardMap().keySet().forEach(baseCard -> {
-                player.queue(new MessagePutCard(stich.getBaseCardMap().get(baseCard), baseCard.suit, baseCard.kind));
+                player.queue(new MessagePutCard(stich.getBaseCardMap().get(baseCard),baseCard));
             });
         }
         switch (state){
             case REIZEN:
-                if(lastReizen.getPlayer().equals(player.getName())){
+                if(lastReizen.getPlayerName().equals(player.getName())){
                     queueOut(player, lastReizen);
                 }
-                player.queue(new MessageDisplayMessage(lastReizen.getPlayer() +": " + lastReizen.getValue()));
+                player.queue(new MessageDisplayMessage(lastReizen.getPlayerName() +": " + lastReizen.getValue()));
                 break;
             case GRAND_HAND:
                 break;

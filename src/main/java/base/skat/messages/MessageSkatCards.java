@@ -1,9 +1,6 @@
 package base.skat.messages;
 
-import base.BaseCard;
-import base.Statics;
-import base.doko.DokoCards;
-import base.doko.messages.MessageGameSelected;
+import base.Card;
 import base.messages.Message;
 import base.skat.SkatCards;
 import com.google.gson.JsonArray;
@@ -16,11 +13,11 @@ public class MessageSkatCards extends Message {
     public final static String OUVERT = "ouvertCards";
     public final static String SKAT = "skat";
 
-    public MessageSkatCards(String command, String player, List<BaseCard> cards) {
+    public MessageSkatCards(String command, String player, List<Card> cards) {
         this.command = command;
         this.params.addProperty("player", player);
         JsonArray array = new JsonArray();
-        cards.forEach(p->array.add(p.toString()));
+        cards.forEach(p->array.add(p.cardNumber));
         params.add("cards",array);
     }
 
@@ -29,16 +26,16 @@ public class MessageSkatCards extends Message {
         this.params = message.getParams();
     }
 
-    public static MessageSkatCards OuvertCards(String player, List<BaseCard> cards){
+    public static MessageSkatCards OuvertCards(String player, List<Card> cards){
         return new MessageSkatCards(OUVERT,player,cards);
     }
 
-    public static MessageSkatCards SkatCards(String player, List<BaseCard> cards){
+    public static MessageSkatCards SkatCards(String player, List<Card> cards){
         return new MessageSkatCards(SKAT,player,cards);
     }
 
-    public List<BaseCard> getCards(){
-        List<BaseCard> list = new ArrayList<>();
+    public List<Card> getCards(){
+        List<Card> list = new ArrayList<>();
         this.params.get("cards").getAsJsonArray().forEach(j-> list.add(SkatCards.ALL_CARDS.get(j.getAsInt())));
         return list;
     }

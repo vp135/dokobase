@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BaseCard {
+public class Card {
 
     public int playOrder;
     public String kind;
@@ -48,7 +48,7 @@ public class BaseCard {
             Statics.KARO+Statics.KOENIG,
             Statics.KARO+Statics.ASS));
 
-    public BaseCard(String kind, String suit, int cardNumber, int value){
+    public Card(String kind, String suit, int cardNumber, int value){
         this.kind = kind;
         this.suit = suit;
         this.trump = false;

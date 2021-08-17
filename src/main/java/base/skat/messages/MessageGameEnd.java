@@ -1,5 +1,8 @@
 package base.skat.messages;
 
+import base.DokoEndDialog;
+import base.IDialogInterface;
+import base.SkatEndDialog;
 import base.messages.Message;
 
 public class MessageGameEnd extends Message {
@@ -13,5 +16,22 @@ public class MessageGameEnd extends Message {
         this.params.addProperty("player2", player2);
         this.params.addProperty("player3", player3);
         this.params.addProperty("remain", remain);
+    }
+    
+    public MessageGameEnd(Message message){
+        this.command = COMMAND;
+        this.params = message.getParams();
+    }
+    
+    public SkatEndDialog getEndDialog(IDialogInterface client, MessageGameSelected.GAMES selectedGame){
+        return new SkatEndDialog(
+                client,
+                selectedGame,
+                this.getParams().get("re1").getAsString(),
+                this.getParams().get("kontra1").getAsString(),
+                this.getParams().get("player1").getAsString(),
+                this.getParams().get("player2").getAsString(),
+                this.getParams().get("player3").getAsString(),
+                this.getParams().get("remain").getAsInt());
     }
 }

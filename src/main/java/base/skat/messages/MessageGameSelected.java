@@ -8,9 +8,30 @@ public class MessageGameSelected extends Message {
     public MessageGameSelected(String player, GAMES game, boolean hand, boolean ouvert){
         this.command = COMMAND;
         this.params.addProperty("player", player);
-        this.params.addProperty("game", game.name());
+        this.params.addProperty("game", game.value);
         this.params.addProperty("hand", hand);
         this.params.addProperty("ouvert", ouvert);
+    }
+
+    public MessageGameSelected(Message message){
+        this.command = COMMAND;
+        this.params = message.getParams();
+    }
+
+    public String getPlayerName(){
+        return params.get("player").getAsString();
+    }
+
+    public GAMES getSelectedGame(){
+        return GAMES.getName(params.get("game").getAsInt());
+    }
+
+    public boolean gethand(){
+        return params.get("hand").getAsBoolean();
+    }
+
+    public boolean getOuvert(){
+        return params.get("ouvert").getAsBoolean();
     }
 
 

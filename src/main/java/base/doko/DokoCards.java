@@ -1,62 +1,61 @@
 package base.doko;
 
-import base.BaseCard;
+import base.Card;
 import base.Statics;
 import base.doko.messages.MessageGameSelected;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class DokoCards {
 
 
-    public static final List<BaseCard> ALL_CARDS = new ArrayList<>(Arrays.asList(
-            new BaseCard(Statics.ZEHN, Statics.KREUZ,0,10),
-            new BaseCard(Statics.ZEHN, Statics.KREUZ,1,10),
-            new BaseCard(Statics.BUBE, Statics.KREUZ,2,2),
-            new BaseCard(Statics.BUBE, Statics.KREUZ,3,2),
-            new BaseCard(Statics.DAME, Statics.KREUZ,4,3),
-            new BaseCard(Statics.DAME, Statics.KREUZ,5,3),
-            new BaseCard(Statics.KOENIG, Statics.KREUZ,6,4),
-            new BaseCard(Statics.KOENIG, Statics.KREUZ,7,4),
-            new BaseCard(Statics.ASS, Statics.KREUZ,8,11),
-            new BaseCard(Statics.ASS, Statics.KREUZ,9,11),
+    public static final List<Card> ALL_CARDS = new ArrayList<>(Arrays.asList(
+            new Card(Statics.ZEHN, Statics.KREUZ,0,10),
+            new Card(Statics.ZEHN, Statics.KREUZ,1,10),
+            new Card(Statics.BUBE, Statics.KREUZ,2,2),
+            new Card(Statics.BUBE, Statics.KREUZ,3,2),
+            new Card(Statics.DAME, Statics.KREUZ,4,3),
+            new Card(Statics.DAME, Statics.KREUZ,5,3),
+            new Card(Statics.KOENIG, Statics.KREUZ,6,4),
+            new Card(Statics.KOENIG, Statics.KREUZ,7,4),
+            new Card(Statics.ASS, Statics.KREUZ,8,11),
+            new Card(Statics.ASS, Statics.KREUZ,9,11),
 
-            new BaseCard(Statics.ZEHN, Statics.PIK,10,10),
-            new BaseCard(Statics.ZEHN, Statics.PIK,11,10),
-            new BaseCard(Statics.BUBE, Statics.PIK,12,2),
-            new BaseCard(Statics.BUBE, Statics.PIK,13,2),
-            new BaseCard(Statics.DAME, Statics.PIK,14,3),
-            new BaseCard(Statics.DAME, Statics.PIK,15,3),
-            new BaseCard(Statics.KOENIG, Statics.PIK,16,4),
-            new BaseCard(Statics.KOENIG, Statics.PIK,17,4),
-            new BaseCard(Statics.ASS, Statics.PIK,18,11),
-            new BaseCard(Statics.ASS, Statics.PIK,19,11),
+            new Card(Statics.ZEHN, Statics.PIK,10,10),
+            new Card(Statics.ZEHN, Statics.PIK,11,10),
+            new Card(Statics.BUBE, Statics.PIK,12,2),
+            new Card(Statics.BUBE, Statics.PIK,13,2),
+            new Card(Statics.DAME, Statics.PIK,14,3),
+            new Card(Statics.DAME, Statics.PIK,15,3),
+            new Card(Statics.KOENIG, Statics.PIK,16,4),
+            new Card(Statics.KOENIG, Statics.PIK,17,4),
+            new Card(Statics.ASS, Statics.PIK,18,11),
+            new Card(Statics.ASS, Statics.PIK,19,11),
 
-            new BaseCard(Statics.ZEHN, Statics.HERZ,20,10),
-            new BaseCard(Statics.ZEHN, Statics.HERZ,21,10),
-            new BaseCard(Statics.BUBE, Statics.HERZ,22,2),
-            new BaseCard(Statics.BUBE, Statics.HERZ,23,2),
-            new BaseCard(Statics.DAME, Statics.HERZ,24,3),
-            new BaseCard(Statics.DAME, Statics.HERZ,25,3),
-            new BaseCard(Statics.KOENIG, Statics.HERZ,26,4),
-            new BaseCard(Statics.KOENIG, Statics.HERZ,27,4),
-            new BaseCard(Statics.ASS, Statics.HERZ,28,11),
-            new BaseCard(Statics.ASS, Statics.HERZ,29,11),
+            new Card(Statics.ZEHN, Statics.HERZ,20,10),
+            new Card(Statics.ZEHN, Statics.HERZ,21,10),
+            new Card(Statics.BUBE, Statics.HERZ,22,2),
+            new Card(Statics.BUBE, Statics.HERZ,23,2),
+            new Card(Statics.DAME, Statics.HERZ,24,3),
+            new Card(Statics.DAME, Statics.HERZ,25,3),
+            new Card(Statics.KOENIG, Statics.HERZ,26,4),
+            new Card(Statics.KOENIG, Statics.HERZ,27,4),
+            new Card(Statics.ASS, Statics.HERZ,28,11),
+            new Card(Statics.ASS, Statics.HERZ,29,11),
 
-            new BaseCard(Statics.ZEHN, Statics.KARO,30,10),
-            new BaseCard(Statics.ZEHN, Statics.KARO,31,10),
-            new BaseCard(Statics.BUBE, Statics.KARO,32,2),
-            new BaseCard(Statics.BUBE, Statics.KARO,33,2),
-            new BaseCard(Statics.DAME, Statics.KARO,34,3),
-            new BaseCard(Statics.DAME, Statics.KARO,35,3),
-            new BaseCard(Statics.KOENIG, Statics.KARO,36,4),
-            new BaseCard(Statics.KOENIG, Statics.KARO,37,4),
-            new BaseCard(Statics.ASS, Statics.KARO,38,11),
-            new BaseCard(Statics.ASS, Statics.KARO,39,11)
+            new Card(Statics.ZEHN, Statics.KARO,30,10),
+            new Card(Statics.ZEHN, Statics.KARO,31,10),
+            new Card(Statics.BUBE, Statics.KARO,32,2),
+            new Card(Statics.BUBE, Statics.KARO,33,2),
+            new Card(Statics.DAME, Statics.KARO,34,3),
+            new Card(Statics.DAME, Statics.KARO,35,3),
+            new Card(Statics.KOENIG, Statics.KARO,36,4),
+            new Card(Statics.KOENIG, Statics.KARO,37,4),
+            new Card(Statics.ASS, Statics.KARO,38,11),
+            new Card(Statics.ASS, Statics.KARO,39,11)
     ));
 
-    public static boolean isTrumpf(BaseCard card, Object object) {
+    public static boolean isTrumpf(Card card, Object object) {
         MessageGameSelected.GAMES gametype = (MessageGameSelected.GAMES) object;
         switch(gametype) {
             case NORMAL:
@@ -96,7 +95,7 @@ public class DokoCards {
     }
 
 
-    public static BaseCard randomCard(){
+    public static Card randomCard(){
         Random r = new Random(System.currentTimeMillis());
         return ALL_CARDS.get(r.nextInt(40));
     }
