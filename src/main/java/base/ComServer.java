@@ -6,35 +6,42 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class ComServer {
 
-    protected Logger log = new Logger("Server",4);
+    protected Logger log;
 
 
     private final ConcurrentLinkedDeque<MessageIn> inMessages = new ConcurrentLinkedDeque<>();
     private final ConcurrentLinkedDeque<MessageOut> outMessages = new ConcurrentLinkedDeque<>();
     private final AutoResetEvent evOut = new AutoResetEvent(true);
     private final AutoResetEvent evIn = new AutoResetEvent(true);
+    public final HashMap<UUID, Message> messageMap = new HashMap<>();
     public static final long TIMEOUT = 1000;
 
     private IServerMessageHandler server;
 
+    private Thread outThread;
+    private Thread inThread;
+
     public boolean listening = false;
 
 
-    public ComServer(int port){
+    public ComServer(int port, int logLevel){
+        log = new Logger("Server",logLevel,true);
         inMessageHandling();
-        //outMessageHandling();
+        outMessageHandling();
         startTCPServer(port);
     }
 
 
     private void startTCPServer(int port) {
-        new Thread(() -> {
+        inThread = new Thread(() -> {
             ServerSocket socket = null;
             log.info("Creating ServerSocket...");
             try {
@@ -78,13 +85,15 @@ public class ComServer {
                                     }
                                 }
                             }
-                        }).start();
+                        },"ComServer_queueMessages").start();
                     }
                 } catch (IOException e) {
                     log.error(e.toString());
                 }
             }
-        }).start();
+        });
+        inThread.setName("ConnectionHandling");
+        inThread.start();
     }
 
     private void inMessageHandling(){
@@ -93,7 +102,6 @@ public class ComServer {
                 try {
                     evIn.waitOne(TIMEOUT);
                     while(inMessages.peek()!=null) {
-                        log.info("messages to handle: " + inMessages.size());
                         server.handleInput(Objects.requireNonNull(inMessages.peek()));
                         inMessages.poll();
                     }
@@ -101,7 +109,7 @@ public class ComServer {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        },"Client2Server").start();
     }
 
     public void outMessageHandling(){
@@ -109,11 +117,15 @@ public class ComServer {
             while (true){
                 try {
                     evOut.waitOne(TIMEOUT);
+                    for (Message m : messageMap.values()) {
+
+                    }
                     while(outMessages.peek()!=null){
                         if(sendReply(outMessages.peek())) {
                             outMessages.poll();
                         }
                     }
+                    //System.out.println(messageMap.size());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -146,7 +158,6 @@ public class ComServer {
 
     public void queueOut(Socket socket, Message message, boolean resetEvent){
         outMessages.offer(new MessageOut(socket,message));
-        log.info("added message: " + message.getCommand());
         if(resetEvent) {
             evOut.set();
         }
@@ -157,7 +168,10 @@ public class ComServer {
     }
 
     public void send2All(List<Socket> sockets, Message message) {
-        sockets.forEach(socket -> queueOut(socket,message,false));
+        sockets.forEach(socket ->{
+            message.newGUID();
+            queueOut(socket,message,false);
+        });
         evOut.set();
     }
 }

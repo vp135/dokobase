@@ -1,15 +1,8 @@
 package base.doko.messages;
 
-import base.DokoEndDialog;
+import base.doko.DokoEndDialog;
 import base.IDialogInterface;
-import base.Player;
 import base.messages.Message;
-import base.doko.Stich;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
-import java.util.HashMap;
-import java.util.List;
 
 public class MessageGameEnd extends Message {
     public final static String COMMAND = "GameEnd";

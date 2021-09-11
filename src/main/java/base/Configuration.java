@@ -1,5 +1,7 @@
 package base;
 
+import base.doko.DokoConfig;
+import base.skat.SkatConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -19,6 +21,7 @@ public class Configuration {
     public SkatConfig skat = new SkatConfig();
     public DokoConfig doko = new DokoConfig();
     public String lastGame = Statics.game.DOKO.name();
+    public int comPlayer = 0;
     public int logLevel=1;
 
 

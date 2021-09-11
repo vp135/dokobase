@@ -157,7 +157,7 @@ public class Assist {
     public void putCard(Card card){
         gameBucket.remove(card);
         playerBucket.remove(card);
-        Display();
+        //Display();
     }
 
     private void Display() {
@@ -183,7 +183,7 @@ public class Assist {
         panel.add(lKaro);
         frame.add(panel);
         frame.pack();
-        Display();
+        //Display();
         frame.setVisible(true);
 
     }

@@ -1,8 +1,7 @@
-package base;
+package base.skat;
 
-import base.skat.SkatCards;
+import base.*;
 import base.messages.*;
-import base.skat.Stich;
 import base.skat.messages.*;
 
 import java.net.Socket;
@@ -10,7 +9,7 @@ import java.util.*;
 
 import static base.Statics.SKAT_STATE.*;
 
-public class SkatServer extends BaseServer{
+public class SkatServer extends BaseServer {
 
     private Random random = new Random(System.currentTimeMillis());
 
@@ -44,9 +43,6 @@ public class SkatServer extends BaseServer{
     public void handleInput(MessageIn message) {
         super.handleInput(message);
         Message requestObject = Message.fromString(message.getInput());
-        Socket socketConnection = message.getSocket();
-        players.stream().filter(player -> player.getSocket()==socketConnection).findFirst().ifPresent(
-                player -> log.info("Received: " + requestObject.getCommand() + " from " + player.getName()));
         try {
             switch (requestObject.getCommand()) {
                 case MessageGameSelected.COMMAND:

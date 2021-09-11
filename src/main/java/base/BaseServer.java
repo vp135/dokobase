@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 
 public class BaseServer implements IServerMessageHandler{
 
-    protected Logger log = new Logger("Server",4);
+    protected Logger log = new Logger("Server",4,true);
     protected Statics.game gameType;
     public ComServer comServer;
     protected final List<Player> players = new ArrayList<>();
-    protected Configuration c;
+    public Configuration c;
     protected String adminName;
     protected boolean gameRunning = false;
     protected int beginner=-1;
@@ -87,6 +87,7 @@ public class BaseServer implements IServerMessageHandler{
     }
 
     protected void queueOut(Player player, Message message) {
+        message.sender = player.getName();
         player.queue(message);
     }
 
@@ -97,30 +98,38 @@ public class BaseServer implements IServerMessageHandler{
     @Override
     public void handleInput(MessageIn message) {
         Message requestObject = Message.fromString(message.getInput());
+        log.info("received " +requestObject.getCommand() + " from " +requestObject.sender);
         Socket socket = message.getSocket();
         try {
-            switch (requestObject.getCommand()) {
-                case MessageAddPlayer.COMMAND:
-                    handleAddPlayer(requestObject, socket);
-                    break;
-                case MessagePlayerList.CHANGE_ORDER:
-                    handleChangePlayerOrder(requestObject);
-                    break;
-                case MessagePutCard.COMMAND:
-                    handlePutCard(requestObject);
-                    break;
-                case MessageAbortGame.COMMAND:
-                    endIt();
-                    break;
-                case MessageReadyForNextRound.COMMAND:
-                    handleReadyForNextRound(requestObject);
-                    break;
-                case MessageGetVersion.COMMAND:
-                    comServer.queueOut(socket, new MessageGetVersion("Server", Statics.VERSION), true);
-                    break;
-                case MessageAdminRequest.COMMAND:
-                    handleAdminRequest(requestObject);
-                    break;
+            if (!comServer.messageMap.containsKey(requestObject.guid)) {
+                switch (requestObject.getCommand()) {
+                    case MessageAddPlayer.COMMAND:
+                        handleAddPlayer(requestObject, socket);
+                        break;
+                    case MessagePlayerList.CHANGE_ORDER:
+                        handleChangePlayerOrder(requestObject);
+                        break;
+                    case MessagePutCard.COMMAND:
+                        handlePutCard(requestObject);
+                        break;
+                    case MessageAbortGame.COMMAND:
+                        endIt();
+                        break;
+                    case MessageReadyForNextRound.COMMAND:
+                        handleReadyForNextRound(requestObject);
+                        break;
+                    case MessageGetVersion.COMMAND:
+                        queueOut(players.stream().filter(player -> player.getName().equals(requestObject.sender)).findFirst().get(),
+                                new MessageGetVersion("Server", Statics.VERSION));
+                        break;
+                    case MessageAdminRequest.COMMAND:
+                        handleAdminRequest(requestObject);
+                        break;
+                }
+            }
+            else{
+                comServer.messageMap.remove(requestObject.guid);
+                players.forEach(player -> player.messageMap.remove(requestObject.guid));
             }
         } catch (Exception ex) {
             log.error(ex.toString());
@@ -168,6 +177,9 @@ public class BaseServer implements IServerMessageHandler{
         });
         players.clear();
         players.addAll(pList);
+        for(int i = 0;i<players.size();i++){
+            players.get(i).setNumber(i);
+        }
         send2All(MessagePlayerList.playerOrderChanged(sList));
     }
 

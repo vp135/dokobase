@@ -3,6 +3,7 @@ package base.doko;
 import base.*;
 import base.doko.messages.MessageGameSelected;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,9 +36,20 @@ public class Stich {
         this.config = config;
     }
 
+    public Stich(MessageGameSelected.GAMES gameType, DokoConfig config){
+        this.gameType = gameType;
+        this.config = config;
+        this.stichnumber = 0;
+        this.players = new ArrayList<>();
+    }
+
     public void addCard(Player player, Card card){
+        addCard(player.getNumber(),card);
+    }
+
+    public void addCard(int playerNumber , Card card){
         card.playOrder = cardMap.size();
-        cardMap.put(card, player.getNumber());
+        cardMap.put(card, playerNumber);
     }
 
     public HashMap<Card, Integer> getCardMap() {
@@ -60,7 +72,7 @@ public class Stich {
         this.points = calculatePoints();
         winner = cardMap.get(currentWinner);
         winningCard = currentWinner;
-        check4ExtraPoints();
+        //check4ExtraPoints();
         return cardMap.get(currentWinner);
     }
 

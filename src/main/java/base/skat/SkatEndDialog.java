@@ -1,5 +1,9 @@
-package base;
+package base.skat;
 
+import base.Card;
+import base.IDialogInterface;
+import base.Player;
+import base.Statics;
 import base.skat.Stich;
 import base.skat.messages.MessageGameSelected;
 

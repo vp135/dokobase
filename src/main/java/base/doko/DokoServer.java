@@ -1,11 +1,9 @@
-package base;
+package base.doko;
 
-import base.doko.DokoCards;
-import base.doko.Stich;
+import base.*;
 import base.doko.messages.*;
 import base.messages.*;
 
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +12,7 @@ import java.util.stream.Collectors;
 
 import static base.doko.messages.MessageGameSelected.GAMES.*;
 
-public class DokoServer extends BaseServer{
+public class DokoServer extends BaseServer {
 
     Random random = new Random(System.currentTimeMillis());
 
@@ -46,9 +44,6 @@ public class DokoServer extends BaseServer{
     public void handleInput(MessageIn message) {
         super.handleInput(message);
         Message requestObject = Message.fromString(message.getInput());
-        Socket socketConnection = message.getSocket();
-        players.stream().filter(player -> player.getSocket()==socketConnection).findFirst().ifPresent(
-                player -> log.info("Received: " + requestObject.getCommand() + " from " + player.getName()));
         try {
             switch (requestObject.getCommand()) {
                 case MessageGameSelected.COMMAND:
@@ -71,7 +66,7 @@ public class DokoServer extends BaseServer{
                     break;
             }
         }catch (Exception ex){
-            log.error(ex.toString());
+            log.error(requestObject +" => " + ex.toString());
         }
     }
 

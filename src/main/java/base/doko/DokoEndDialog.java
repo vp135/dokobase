@@ -1,5 +1,7 @@
-package base;
+package base.doko;
 
+import base.IDialogInterface;
+import base.Player;
 import base.doko.Stich;
 
 import javax.swing.*;

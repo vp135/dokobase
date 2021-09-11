@@ -1,7 +1,10 @@
 package base;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class Logger {
 
@@ -25,14 +28,16 @@ public class Logger {
     }
 
     private void writeLog(String logLevel, String msg){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+        GregorianCalendar calendar = new GregorianCalendar(TimeZone.getTimeZone("DE"));
+        calendar.setTimeInMillis(System.currentTimeMillis());
         try(FileWriter fw = new FileWriter(filename, true);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {
-            String timestamp = LocalDateTime.now().toString().
-                    replace("T"," ").split("\\.")[0];
-            out.println(timestamp+"("+(System.currentTimeMillis()-lastlogged)+") - " +logLevel
-                    +" - "+ Thread.currentThread().getId()+" - " + name +" - "+ msg);
+            String timestamp = sdf.format(calendar.getTime());
+            out.println(timestamp + " - " +logLevel
+                    +" - "+ Thread.currentThread().getName()+ "("+Thread.currentThread().getId()+") - " + msg);
             lastlogged = System.currentTimeMillis();
         } catch (IOException e) {
             e.printStackTrace();

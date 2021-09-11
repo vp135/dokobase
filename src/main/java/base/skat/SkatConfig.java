@@ -1,4 +1,4 @@
-package base;
+package base.skat;
 
 public class SkatConfig {
 

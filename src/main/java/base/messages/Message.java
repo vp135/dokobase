@@ -1,16 +1,27 @@
 package base.messages;
 
+import base.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.UUID;
 
 public class Message {
 
+    //private static Logger log = new Logger("Messages",4,true);
+
     protected String command;
     protected JsonObject params = new JsonObject();
+    public UUID guid;
+    public String sender;
+
+
+    public Message(){
+        guid = UUID.randomUUID();
+    }
 
     public String getCommand() {
         return command;
@@ -23,7 +34,8 @@ public class Message {
     public static Message fromString(String json){
         Gson gson = new Gson();
         Type token = new TypeToken<Message>(){}.getType();
-        return (gson.fromJson(json,token));
+        Message message = (gson.fromJson(json,token));
+        return message;
     }
 
     public String toJson(){
@@ -37,4 +49,7 @@ public class Message {
         return gson.toJsonTree(this).getAsJsonObject();
     }
 
+    public void newGUID() {
+        this.guid = UUID.randomUUID();
+    }
 }

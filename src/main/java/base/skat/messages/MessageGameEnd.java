@@ -1,8 +1,7 @@
 package base.skat.messages;
 
-import base.DokoEndDialog;
 import base.IDialogInterface;
-import base.SkatEndDialog;
+import base.skat.SkatEndDialog;
 import base.messages.Message;
 
 public class MessageGameEnd extends Message {

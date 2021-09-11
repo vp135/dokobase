@@ -11,4 +11,13 @@ public class MessageWait4Player extends Message {
         this.params = new JsonObject();
         this.params.addProperty("player", playername);
     }
+
+    public MessageWait4Player(Message message){
+        this.command = COMMAND;
+        this.params = message.getParams();
+    }
+
+    public String getPlayerName(){
+        return this.params.get("player").getAsString();
+    }
 }

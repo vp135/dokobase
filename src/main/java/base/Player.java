@@ -3,12 +3,14 @@ package base;
 import base.messages.Message;
 
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Player {
     private final String name;
-    private final int number;
+    private int number;
     private transient Socket socket;
     private boolean spectator;
     private List<Card> hand;
@@ -20,10 +22,11 @@ public class Player {
     private final ConcurrentLinkedDeque<Message> outMessages = new ConcurrentLinkedDeque<>();
     private final AutoResetEvent evOut = new AutoResetEvent(true);
     private ComServer comServer;
-    public static final long TIMEOUT = 1000;
+    public static final long TIMEOUT = 5000;
 
 
     private final Logger log = new Logger("Players",3,true);
+    public final HashMap<UUID, Message> messageMap = new HashMap<>();
 
     public boolean isAdmin() {
         return admin;
@@ -56,7 +59,7 @@ public class Player {
         this.socket = socket;
         this.spectator = spectator;
         this.re = re;
-        this.comServer =comServer;
+        this.comServer = comServer;
         outMessageHandling();
     }
 
@@ -76,6 +79,10 @@ public class Player {
 
     public int getNumber() {
         return number;
+    }
+
+    public void setNumber(int number){
+        this.number = number;
     }
 
     public Socket getSocket() {
@@ -170,7 +177,7 @@ public class Player {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        },"Server2Client("+ this.name+")").start();
     }
 
     public void removeCard(String farbe,String wert) {
