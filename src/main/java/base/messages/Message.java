@@ -1,6 +1,5 @@
 package base.messages;
 
-import base.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -11,7 +10,6 @@ import java.util.UUID;
 
 public class Message {
 
-    //private static Logger log = new Logger("Messages",4,true);
 
     protected String command;
     protected JsonObject params = new JsonObject();
@@ -19,7 +17,7 @@ public class Message {
     public String sender;
 
 
-    public Message(){
+    public Message() {
         guid = UUID.randomUUID();
     }
 
@@ -31,20 +29,21 @@ public class Message {
         return params;
     }
 
-    public static Message fromString(String json){
+    public static Message fromString(String json) {
         Gson gson = new Gson();
-        Type token = new TypeToken<Message>(){}.getType();
-        Message message = (gson.fromJson(json,token));
-        return message;
+        Type token = new TypeToken<Message>() {
+        }.getType();
+        return (gson.fromJson(json, token));
     }
 
-    public String toJson(){
+    public String toJson() {
         Gson gson = new GsonBuilder().serializeNulls().create();
-        Type token = new TypeToken<Message>(){}.getType();
-        return (gson.toJson(this,token));
+        Type token = new TypeToken<Message>() {
+        }.getType();
+        return (gson.toJson(this, token));
     }
 
-    public JsonObject toJsonObject(){
+    public JsonObject toJsonObject() {
         Gson gson = new GsonBuilder().serializeNulls().create();
         return gson.toJsonTree(this).getAsJsonObject();
     }

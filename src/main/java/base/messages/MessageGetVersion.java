@@ -10,16 +10,16 @@ public class MessageGetVersion extends Message {
         this.params.addProperty("version", version);
     }
 
-    public MessageGetVersion(Message message){
+    public MessageGetVersion(Message message) {
         this.command = COMMAND;
         this.params = message.getParams();
     }
 
-    public String getPlayerName(){
+    public String getPlayerName() {
         return params.get("player").getAsString();
     }
 
-    public String getVersion(){
+    public String getVersion() {
         return params.get("version").getAsString();
     }
 }

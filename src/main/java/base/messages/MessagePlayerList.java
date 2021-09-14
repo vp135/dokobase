@@ -7,17 +7,17 @@ import java.util.List;
 
 public class MessagePlayerList extends Message {
 
-    public final static String IN_LOBBY ="PlayersInLobby";
+    public final static String IN_LOBBY = "PlayersInLobby";
     public final static String CHANGE_ORDER = "changePlayerOrder";
 
 
     public MessagePlayerList(List<String> players, String command) {
-        this.command= command;
+        this.command = command;
         JsonArray p = new JsonArray();
-        for (String s:players){
+        for (String s : players) {
             p.add(s);
         }
-        this.params.add("players",p);
+        this.params.add("players", p);
     }
 
     public MessagePlayerList(Message message) {
@@ -25,17 +25,17 @@ public class MessagePlayerList extends Message {
         this.params = message.getParams();
     }
 
-    public static MessagePlayerList playersInLobby(List<String> players){
-        return new MessagePlayerList(players,IN_LOBBY);
+    public static MessagePlayerList playersInLobby(List<String> players) {
+        return new MessagePlayerList(players, IN_LOBBY);
     }
 
-    public static MessagePlayerList playerOrderChanged(List<String> players){
-        return new MessagePlayerList(players,CHANGE_ORDER);
+    public static MessagePlayerList playerOrderChanged(List<String> players) {
+        return new MessagePlayerList(players, CHANGE_ORDER);
     }
 
-    public List<String> getPlayerNamesList(){
+    public List<String> getPlayerNamesList() {
         List<String> list = new ArrayList<>();
-        params.get("players").getAsJsonArray().forEach(j->list.add(j.getAsString()));
+        params.get("players").getAsJsonArray().forEach(j -> list.add(j.getAsString()));
         return list;
     }
 }

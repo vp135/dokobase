@@ -1,15 +1,12 @@
 package base.messages;
 
-import com.google.gson.JsonObject;
-
 public class MessageDisplayMessage extends Message {
 
     public final static String COMMAND = "DisplayMessage";
 
     public MessageDisplayMessage(String msg) {
         this.command = COMMAND;
-        this.params = new JsonObject();
-        this.params.addProperty("message",msg);
+        this.params.addProperty("message", msg);
     }
 
     public MessageDisplayMessage(Message message) {
@@ -17,7 +14,7 @@ public class MessageDisplayMessage extends Message {
         this.params = message.getParams();
     }
 
-    public String getText(){
+    public String getText() {
         return params.get("message").getAsString();
     }
 }
