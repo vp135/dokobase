@@ -13,12 +13,12 @@ public class Message {
 
     protected String command;
     protected JsonObject params = new JsonObject();
-    public UUID guid;
+    //public UUID guid;
     public String sender;
 
 
     public Message() {
-        guid = UUID.randomUUID();
+        //guid = UUID.randomUUID();
     }
 
     public String getCommand() {
@@ -48,6 +48,6 @@ public class Message {
     }
 
     public void newGUID() {
-        this.guid = UUID.randomUUID();
+        //this.guid = UUID.randomUUID();
     }
 }
