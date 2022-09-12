@@ -79,6 +79,7 @@ public class ComClient {
                             log.error(ex.toString());
                             socket = null;
                         }
+                        System.out.println("waiting");
                     }
                 }
             }
@@ -158,6 +159,7 @@ public class ComClient {
             while (socket == null) {
                 try {
                     socket = new Socket(hostname, port);
+                    socket.setTcpNoDelay(false);
                     Listen();
                     log.info("Connected to Server");
                 } catch (IOException e) {
