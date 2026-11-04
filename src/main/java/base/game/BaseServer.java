@@ -214,7 +214,7 @@ public class BaseServer implements IServerMessageHandler {
                 } else {
                     List<String> list = new ArrayList<>();
                     players.forEach(p -> list.add(p.getName()));
-                    comServer.queueOut(player.getSocket(), MessagePlayerList.playersInLobby(list), true);
+                    player.queue(MessagePlayerList.playersInLobby(list));
                 }
             });
         }

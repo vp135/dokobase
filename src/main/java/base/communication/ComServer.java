@@ -11,7 +11,6 @@ import base.messages.MessageOut;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -46,41 +45,43 @@ public class ComServer {
                 socket = new ServerSocket(port);
                 log.info("ServerSocket created: " + socket.getInetAddress() + ":" + socket.getLocalPort());
             } catch (IOException e) {
-                log.info("Socket creation failed:\n" + e);
+                log.error("Socket creation failed: " + e);
+                return;
             }
             while (true) {
                 Socket connectionSocket;
                 try {
-                    assert socket != null;
                     listening = true;
                     connectionSocket = socket.accept();
                     log.info("Connection established");
                     if (connectionSocket != null) {
+                        connectionSocket.setKeepAlive(true);
+                        connectionSocket.setTcpNoDelay(true);
                         new Thread(() -> {
-                            while (!connectionSocket.isClosed()) {
-                                BufferedReader br;
-                                try {
-                                    br = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream(), StandardCharsets.UTF_8));
+                            try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                                    connectionSocket.getInputStream(), StandardCharsets.UTF_8))) {
+                                while (!connectionSocket.isClosed()) {
                                     StringBuilder builder = new StringBuilder();
                                     ComHelper.readBufferedReaderAndCheck(br, builder);
+                                    if (builder.length() == 0) {
+                                        continue;
+                                    }
                                     inMessages.offer(new MessageIn(connectionSocket, builder.toString()));
                                     evIn.set();
-                                } catch (Exception e) {
-                                    if (e instanceof SocketException) {
-                                        log.info(e.toString());
-                                        try {
-                                            connectionSocket.close();
-                                        } catch (IOException ex) {
-                                            log.error(ex.toString());
-                                        }
-                                    } else {
-                                        log.error(Arrays.toString(e.getStackTrace()));
-                                    }
                                 }
+                            } catch (IOException e) {
+                                if (!connectionSocket.isClosed()) {
+                                    log.info("Client connection closed: " + e);
+                                }
+                            } finally {
+                                closeSocket(connectionSocket);
                             }
                         }, "ComServer_queueMessages").start();
                     }
                 } catch (IOException e) {
+                    if (socket.isClosed()) {
+                        return;
+                    }
                     log.error(e.toString());
                 }
             }
@@ -118,12 +119,17 @@ public class ComServer {
                 try {
                     evOut.waitOne(TIMEOUT);
                     while (outMessages.peek() != null) {
-                        if (sendByTCP(outMessages.peek())) {
+                        MessageOut message = outMessages.peek();
+                        if (sendByTCP(message)) {
+                            outMessages.poll();
+                        } else {
+                            log.warn("Dropping direct message for unavailable socket");
                             outMessages.poll();
                         }
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                    return;
                 }
             }
         }).start();
@@ -143,5 +149,12 @@ public class ComServer {
         this.server = server;
     }
 
+    public void closeSocket(Socket socket) {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            log.warn(e.toString());
+        }
+    }
 
 }

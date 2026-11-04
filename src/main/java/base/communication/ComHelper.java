@@ -10,43 +10,34 @@ import java.nio.charset.StandardCharsets;
 public class ComHelper {
 
     public static void readBufferedReaderAndCheck(BufferedReader br, StringBuilder builder) throws IOException {
-        int c;
-        int brakets=0;
-        while((c= br.read())>-1&&c!=10&&c!=13){
-            switch (c) {
-                case 123:
-                    brakets++;
-                    break;
-                case 125:
-                    brakets--;
-                    break;
-            }
-            builder.append((char)c);
-            //System.out.println(builder);
-            if (brakets==0){
-                break;
-            }
+        String line = br.readLine();
+        if (line == null) {
+            throw new EOFException("Connection closed");
         }
+        builder.append(line);
     }
 
 
     public static boolean sendByTCP(Socket socket, Message message, Logger log) {
-        if (socket!=null && !socket.isClosed()) {
+        if (socket != null && socket.isConnected() && !socket.isClosed() && !socket.isOutputShutdown()) {
             try {
-                PrintWriter out = new PrintWriter(new BufferedWriter(
-                        new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8)), true);
-                String s = message.toJson();
-                log.error(s);
-                out.println(s);
+                byte[] payload = (message.toJson() + "\n").getBytes(StandardCharsets.UTF_8);
+                OutputStream out = socket.getOutputStream();
+                out.write(payload);
                 out.flush();
-                log.info(s);
+                log.info("Sent " + message.getCommand());
                 return true;
             } catch (IOException ex) {
                 log.error(ex.toString());
+                try {
+                    socket.close();
+                } catch (IOException closeException) {
+                    log.warn(closeException.toString());
+                }
                 return false;
             }
         } else {
-            log.warn("socket was unexpectedly closed - Trying to reopen connection");
+            log.warn("Socket is unavailable");
             return false;
         }
     }

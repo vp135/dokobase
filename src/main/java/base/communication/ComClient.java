@@ -8,6 +8,7 @@ import base.messages.Message;
 import base.messages.MessageAddPlayer;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -17,15 +18,18 @@ public class ComClient {
 
     private final Logger log;
 
-    private static final long TIMEOUT = 5000;
+    private static final long TIMEOUT = 1000;
+    private static final long INITIAL_RETRY_DELAY = 500;
+    private static final long MAX_RETRY_DELAY = 10000;
     private final AutoResetEvent evOut = new AutoResetEvent(true);
     private final AutoResetEvent evIn = new AutoResetEvent(true);
     private final ConcurrentLinkedDeque<Message> outMessages = new ConcurrentLinkedDeque<>();
     private final ConcurrentLinkedDeque<Message> inMessages = new ConcurrentLinkedDeque<>();
+    private final AtomicBoolean connecting = new AtomicBoolean(false);
 
     private IClientMessageHandler client;
 
-    private Socket socket;
+    private volatile Socket socket;
     private final String hostname;
     private final int port;
     private final String name;
@@ -56,41 +60,32 @@ public class ComClient {
     }
 
 
-    private void Listen() {
-         new Thread(() -> {
-            if (socket != null) {
-                BufferedReader in = null;
-                try {
-                    in = new BufferedReader(new InputStreamReader(socket.getInputStream(),
-                            StandardCharsets.UTF_8));
-                } catch (Exception ex) {
-                    log.error(ex.toString());
+    private void listen(Socket connection) {
+        new Thread(() -> {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(
+                    connection.getInputStream(), StandardCharsets.UTF_8))) {
+                StringBuilder builder = new StringBuilder();
+                while (true) {
+                    builder.setLength(0);
+                    ComHelper.readBufferedReaderAndCheck(in, builder);
+                    inMessages.offer(Message.fromString(builder.toString()));
+                    evIn.set();
                 }
-                if (in != null) {
-                    while (socket != null) {
-                        try {
-                            StringBuilder builder = new StringBuilder();
-                            ComHelper.readBufferedReaderAndCheck(in,builder);
-                                if (builder.length()>0) {
-                                    inMessages.offer(Message.fromString(builder.toString()));
-                                    evIn.set();
-                                }
-                        } catch (Exception ex) {
-                            log.error(ex.toString());
-                            socket = null;
-                        }
-                        System.out.println("waiting");
-                    }
+            } catch (IOException ex) {
+                if (!connection.isClosed()) {
+                    log.info("Connection to Server closed: " + ex);
                 }
+            } finally {
+                closeConnection(connection);
             }
-        },"Listen").start();
+        }, "Listen").start();
     }
 
 
 
     private void inMessagehandling() {
         Thread inThread = new Thread(() -> {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     evIn.waitOne(TIMEOUT);
                     while (inMessages.peek() != null) {
@@ -98,8 +93,7 @@ public class ComClient {
                         client.handleInput(inMessages.poll());
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    log.error(e.toString());
+                    Thread.currentThread().interrupt();
                 }
             }
         });
@@ -124,26 +118,26 @@ public class ComClient {
 
     public void outMessageHandling() {
         Thread outThread = new Thread(() -> {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     evOut.waitOne(TIMEOUT);
-                    if ((socket == null || socket.isClosed()) && !wait.get()) {
+                    if (!isSocketConnected() && !wait.get()) {
                         openTCPConnection();
                     }
-                    if (socket != null && socket.isConnected()) {
-                        while (outMessages.peek() != null) {
-                            if (ComHelper.sendByTCP(socket, outMessages.peek(),log)) {
+                    Socket connection = socket;
+                    if (isConnected(connection)) {
+                        while (outMessages.peek() != null && isConnected(connection)) {
+                            if (ComHelper.sendByTCP(connection, outMessages.peek(), log)) {
                                 outMessages.poll();
                             }
-                            else{
-                                socket = null;
+                            else {
+                                closeConnection(connection);
                                 break;
                             }
                         }
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    log.error(e.toString());
+                    Thread.currentThread().interrupt();
                 }
             }
         });
@@ -154,27 +148,45 @@ public class ComClient {
 
 
     public void openTCPConnection() {
+        if (isSocketConnected() || !connecting.compareAndSet(false, true)) {
+            return;
+        }
         wait.set(true);
         new Thread(() -> {
-            while (socket == null) {
+            long retryDelay = INITIAL_RETRY_DELAY;
+            while (!Thread.currentThread().isInterrupted() && !isSocketConnected()) {
+                Socket connection = new Socket();
                 try {
-                    socket = new Socket(hostname, port);
-                    socket.setTcpNoDelay(false);
-                    Listen();
+                    connection.connect(new InetSocketAddress(hostname, port), (int) (TIMEOUT * 5));
+                    connection.setKeepAlive(true);
+                    connection.setTcpNoDelay(true);
+                    synchronized (this) {
+                        socket = connection;
+                    }
+                    listen(connection);
                     log.info("Connected to Server");
+                    retryDelay = INITIAL_RETRY_DELAY;
+                    queueOut(new MessageAddPlayer(name));
+                    break;
                 } catch (IOException e) {
                     try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException interruptedException) {
-                        interruptedException.printStackTrace();
+                        connection.close();
+                    } catch (IOException closeException) {
+                        log.warn(closeException.toString());
                     }
                     log.warn("Could not connect to Server: " + e);
+                    try {
+                        Thread.sleep(retryDelay);
+                    } catch (InterruptedException interruptedException) {
+                        Thread.currentThread().interrupt();
+                    }
+                    retryDelay = Math.min(retryDelay * 2, MAX_RETRY_DELAY);
                 }
             }
             wait.set(false);
-            queueOut(new MessageAddPlayer(name));
+            connecting.set(false);
             evOut.set();
-        }, "openConnection").start();
+        }, "openConnection(" + name + ")").start();
 
     }
 
@@ -187,7 +199,33 @@ public class ComClient {
     }
 
     public boolean socketNotNull() {
-        return socket != null;
+        return isSocketConnected();
+    }
+
+    private boolean isSocketConnected() {
+        return isConnected(socket);
+    }
+
+    private boolean isConnected(Socket connection) {
+        return connection != null && connection.isConnected()
+                && !connection.isClosed() && !connection.isInputShutdown()
+                && !connection.isOutputShutdown();
+    }
+
+    private synchronized void closeConnection(Socket connection) {
+        if (connection == null) {
+            return;
+        }
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            log.warn(ex.toString());
+        } finally {
+            if (socket == connection) {
+                socket = null;
+                evOut.set();
+            }
+        }
     }
 
 

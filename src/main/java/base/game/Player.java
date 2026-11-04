@@ -5,15 +5,13 @@ import base.helper.AutoResetEvent;
 import base.messages.Message;
 
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Player {
     private final String name;
     private int number;
-    private Socket socket;
-    private List<Socket> socketList;
+    private volatile Socket socket;
     private boolean spectator;
     private List<Card> hand;
     private boolean re;
@@ -55,11 +53,9 @@ public class Player {
 
     public Player(String name, int number, Socket socket, boolean spectator, ComServer comServer) {
         System.out.println("player:" + name);
-        this.socketList = new ArrayList<>();
         this.name = name;
         this.number = number;
         this.socket = socket;
-        this.socketList.add(socket);
         this.spectator = spectator;
         this.re = false;
         this.comServer = comServer;
@@ -82,9 +78,13 @@ public class Player {
         return socket;
     }
 
-    public void setSocket(Socket socket) {
+    public synchronized void setSocket(Socket socket) {
+        Socket previousSocket = this.socket;
         this.socket = socket;
-        this.socketList.add(socket);
+        if (previousSocket != null && previousSocket != socket) {
+            comServer.closeSocket(previousSocket);
+        }
+        evOut.set();
     }
 
     public boolean isNotSpectator() {
@@ -156,13 +156,22 @@ public class Player {
                 try {
                     evOut.waitOne(TIMEOUT);
                     while (outMessages.peek() != null) {
-                        for (Socket s : socketList) {
-                            comServer.sendByTCP(s, outMessages.peek());
+                        Socket activeSocket = socket;
+                        if (activeSocket == null || activeSocket.isClosed()) {
+                            break;
                         }
-                        outMessages.poll();
+                        if (comServer.sendByTCP(activeSocket, outMessages.peek())) {
+                            outMessages.poll();
+                        } else {
+                            if (socket == activeSocket) {
+                                socket = null;
+                            }
+                            break;
+                        }
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                    return;
                 }
             }
         }, "Server2Client(" + this.name + ")").start();
