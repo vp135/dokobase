@@ -1,13 +1,14 @@
 package base.messages;
 
+import base.Constants;
 public class MessageUpdateUserPanel extends Message {
 
-    public final static String COMMAND = "UpdateUserPanel";
+    public final static String COMMAND = Constants.UPDATE_USER_PANEL_COMMAND;
 
     public MessageUpdateUserPanel(String p, String text) {
         this.command = COMMAND;
-        this.params.addProperty("player", p);
-        this.params.addProperty("text", text);
+        this.params.addProperty(Constants.PLAYER, p);
+        this.params.addProperty(Constants.TEXT, text);
     }
 
     public MessageUpdateUserPanel(Message message) {
@@ -16,10 +17,10 @@ public class MessageUpdateUserPanel extends Message {
     }
 
     public String getPlayerName() {
-        return params.get("player").getAsString();
+        return params.get(Constants.PLAYER).getAsString();
     }
 
     public String getText() {
-        return params.get("text").getAsString();
+        return params.get(Constants.TEXT).getAsString();
     }
 }

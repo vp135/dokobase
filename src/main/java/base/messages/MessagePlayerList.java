@@ -1,5 +1,6 @@
 package base.messages;
 
+import base.Constants;
 import com.google.gson.JsonArray;
 
 import java.util.ArrayList;
@@ -7,8 +8,8 @@ import java.util.List;
 
 public class MessagePlayerList extends Message {
 
-    public final static String IN_LOBBY = "PlayersInLobby";
-    public final static String CHANGE_ORDER = "changePlayerOrder";
+    public final static String IN_LOBBY = Constants.PLAYER_LIST_IN_LOBBY;
+    public final static String CHANGE_ORDER = Constants.PLAYER_LIST_CHANGE_ORDER;
 
 
     public MessagePlayerList(List<String> players, String command) {
@@ -17,7 +18,7 @@ public class MessagePlayerList extends Message {
         for (String s : players) {
             p.add(s);
         }
-        this.params.add("players", p);
+        this.params.add(Constants.PLAYERS, p);
     }
 
     public MessagePlayerList(Message message) {
@@ -35,7 +36,7 @@ public class MessagePlayerList extends Message {
 
     public List<String> getPlayerNamesList() {
         List<String> list = new ArrayList<>();
-        params.get("players").getAsJsonArray().forEach(j -> list.add(j.getAsString()));
+        params.get(Constants.PLAYERS).getAsJsonArray().forEach(j -> list.add(j.getAsString()));
         return list;
     }
 }

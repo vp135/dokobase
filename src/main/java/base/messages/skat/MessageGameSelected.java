@@ -1,16 +1,17 @@
 package base.messages.skat;
 
+import base.Constants;
 import base.messages.Message;
 
 public class MessageGameSelected extends Message {
-    public final static String COMMAND = "gameSelected";
+    public final static String COMMAND = Constants.SKAT_GAME_SELECTED_COMMAND;
 
     public MessageGameSelected(String player, GAMES game, boolean hand, boolean ouvert) {
         this.command = COMMAND;
-        this.params.addProperty("player", player);
-        this.params.addProperty("game", game.value);
-        this.params.addProperty("hand", hand);
-        this.params.addProperty("ouvert", ouvert);
+        this.params.addProperty(Constants.PLAYER, player);
+        this.params.addProperty(Constants.GAME, game.value);
+        this.params.addProperty(Constants.HAND, hand);
+        this.params.addProperty(Constants.OUVERT, ouvert);
     }
 
     public MessageGameSelected(Message message) {
@@ -19,19 +20,19 @@ public class MessageGameSelected extends Message {
     }
 
     public String getPlayerName() {
-        return params.get("player").getAsString();
+        return params.get(Constants.PLAYER).getAsString();
     }
 
     public GAMES getSelectedGame() {
-        return GAMES.getName(params.get("game").getAsInt());
+        return GAMES.getName(params.get(Constants.GAME).getAsInt());
     }
 
     public boolean gethand() {
-        return params.get("hand").getAsBoolean();
+        return params.get(Constants.HAND).getAsBoolean();
     }
 
     public boolean getOuvert() {
-        return params.get("ouvert").getAsBoolean();
+        return params.get(Constants.OUVERT).getAsBoolean();
     }
 
 

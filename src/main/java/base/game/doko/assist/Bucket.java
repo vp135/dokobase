@@ -1,5 +1,6 @@
 package base.game.doko.assist;
 
+import base.Constants;
 import base.Statics;
 import base.game.Card;
 import base.game.doko.Compare;
@@ -73,7 +74,7 @@ public class Bucket {
                 miss++;
             }
         }
-        return ("Anzahl unbekannte Kreuz: " + kreuz.size() + "\n" +
+        return ("Anzahl unbekannte Kreuz: " + kreuz.size() + Constants.NEWLINE +
                 "miss(" + miss + ")/total(" + total + ")=" + (double) miss / (double) total);
     }
 
@@ -110,20 +111,20 @@ public class Bucket {
             case Statics.KARO:
                 return createHtmlString(this.karo, otherBucket.karo);
             default:
-                return "";
+                return Constants.EMPTY_STRING;
         }
     }
 
     private String createHtmlString(List<Card> trumpf, List<Card> trumpf1) {
-        StringBuilder builder = new StringBuilder("<html>");
+        StringBuilder builder = new StringBuilder(Constants.HTML_OPEN);
         for (Card card : trumpf) {
             if (trumpf1.contains(card)) {
-                builder.append(addColor(card.toString(), "red")).append("<br>");
+                builder.append(addColor(card.toString(), Constants.RED)).append(Constants.HTML_BREAK);
             } else {
-                builder.append(card.toString()).append("<br>");
+                builder.append(card.toString()).append(Constants.HTML_BREAK);
             }
         }
-        builder.append("</html>");
+        builder.append(Constants.HTML_CLOSE);
 
         return builder.toString();
     }
@@ -132,7 +133,7 @@ public class Bucket {
     private static String addColor(String s, String color) {
         return "<font color=\"" +
                 color +
-                "\">" +
+                Constants.QUOTE +
                 s +
                 "</font>";
     }

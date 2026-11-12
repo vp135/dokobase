@@ -1,10 +1,11 @@
 package base.messages.admin;
 
+import base.Constants;
 import base.messages.Message;
 
 public class MessageAbortGame extends Message {
 
-    public final static String COMMAND = "AbortGame";
+    public final static String COMMAND = Constants.ADMIN_ABORT_GAME_COMMAND;
 
     public MessageAbortGame() {
         this.command = COMMAND;

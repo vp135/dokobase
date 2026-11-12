@@ -1,5 +1,6 @@
 package base.game.doko;
 
+import base.Constants;
 import base.Statics;
 import base.config.DokoConfig;
 import base.game.Card;
@@ -117,26 +118,26 @@ public class Stich {
         }
         if (karlchen > 0) {
             if (builder.length() > 0) {
-                builder.append(";");
+                builder.append(Constants.SEMICOLON);
             }
             builder.append("Karlchen");
         }
         if (herzstich > 0) {
             if (builder.length() > 0) {
-                builder.append(";");
+                builder.append(Constants.SEMICOLON);
             }
             builder.append("Herzstich");
         }
         if (fuchsGefangen > 0) {
             if (builder.length() > 0) {
-                builder.append(";");
+                builder.append(Constants.SEMICOLON);
             }
-            builder.append("Fuchs gefangen(").append(fuchsGefangen).append(")");
+            builder.append("Fuchs gefangen(").append(fuchsGefangen).append(Constants.CLOSE_PARENTHESIS);
         }
         if (builder.length() > 0) {
-            return "(" + builder + ")";
+            return Constants.OPEN_PARENTHESIS + builder + Constants.CLOSE_PARENTHESIS;
         } else {
-            return "";
+            return Constants.EMPTY_STRING;
         }
     }
 
@@ -211,11 +212,11 @@ public class Stich {
         StringBuilder s = new StringBuilder();
         cardMap.keySet().forEach(card -> s
                 .append(cardMap.get(card))
-                .append(":")
+                .append(Constants.COLON)
                 .append(card.suit)
-                .append(" ")
+                .append(Constants.SPACE)
                 .append(card.kind)
-                .append("\n"));
+                .append(Constants.NEWLINE));
         return s.toString();
     }
 

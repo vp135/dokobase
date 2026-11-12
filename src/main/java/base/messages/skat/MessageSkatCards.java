@@ -1,5 +1,6 @@
 package base.messages.skat;
 
+import base.Constants;
 import base.game.Card;
 import base.game.skat.SkatCards;
 import base.messages.Message;
@@ -10,15 +11,15 @@ import java.util.List;
 
 public class MessageSkatCards extends Message {
 
-    public final static String OUVERT = "ouvertCards";
-    public final static String SKAT = "skat";
+    public final static String OUVERT = Constants.SKAT_SKAT_CARDS_OUVERT;
+    public final static String SKAT = Constants.SKAT;
 
     public MessageSkatCards(String command, String player, List<Card> cards) {
         this.command = command;
-        this.params.addProperty("player", player);
+        this.params.addProperty(Constants.PLAYER, player);
         JsonArray array = new JsonArray();
         cards.forEach(p -> array.add(p.cardNumber));
-        params.add("cards", array);
+        params.add(Constants.CARDS, array);
     }
 
     public MessageSkatCards(Message message) {
@@ -36,12 +37,12 @@ public class MessageSkatCards extends Message {
 
     public List<Card> getCards() {
         List<Card> list = new ArrayList<>();
-        this.params.get("cards").getAsJsonArray().forEach(j -> list.add(SkatCards.ALL_CARDS.get(j.getAsInt())));
+        this.params.get(Constants.CARDS).getAsJsonArray().forEach(j -> list.add(SkatCards.ALL_CARDS.get(j.getAsInt())));
         return list;
     }
 
     public String getPlayerName() {
-        return params.get("player").getAsString();
+        return params.get(Constants.PLAYER).getAsString();
     }
 
 }

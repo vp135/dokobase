@@ -1,20 +1,21 @@
 package base.messages.doko;
 
+import base.Constants;
 import base.messages.Message;
 
 public class MessageGetArmut extends Message {
 
-    public final static String COMMAND = "GetArmut";
+    public final static String COMMAND = Constants.DOKO_GET_ARMUT_COMMAND;
 
     public MessageGetArmut() {
         this.command = COMMAND;
-        this.params.addProperty("player", -1);
+        this.params.addProperty(Constants.PLAYER, -1);
     }
 
     public MessageGetArmut(int p, boolean getArmut) {
         this.command = COMMAND;
-        this.params.addProperty("player", p);
-        this.params.addProperty("getArmut", getArmut);
+        this.params.addProperty(Constants.PLAYER, p);
+        this.params.addProperty(Constants.GET_ARMUT, getArmut);
     }
 
     public MessageGetArmut(Message message) {
@@ -23,10 +24,10 @@ public class MessageGetArmut extends Message {
     }
 
     public int getPlayerNumber() {
-        return params.get("player").getAsInt();
+        return params.get(Constants.PLAYER).getAsInt();
     }
 
     public boolean getsArmut() {
-        return params.get("getArmut").getAsBoolean();
+        return params.get(Constants.GET_ARMUT).getAsBoolean();
     }
 }

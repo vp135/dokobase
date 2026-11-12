@@ -1,14 +1,16 @@
 package base.game;
 
+import base.Constants;
 import base.Statics;
 import base.communication.ComServer;
 import base.config.Configuration;
 import base.game.doko.DokoServer;
 import base.game.skat.SkatServer;
-import base.helper.Logger;
+import base.helper.Loggers;
 import base.interfaces.IServerMessageHandler;
 import base.messages.*;
 import base.messages.admin.*;
+import org.slf4j.Logger;
 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -36,7 +38,7 @@ public class BaseServer implements IServerMessageHandler {
 
     public BaseServer(Configuration c, ComServer comServer) {
         this.c = c;
-        this.log = new Logger("Server", c.logLevel, true, c.logType);
+        this.log = Loggers.server();
         this.comServer = comServer;
         comServer.setServer(this);
     }
@@ -85,47 +87,106 @@ public class BaseServer implements IServerMessageHandler {
 
     @Override
     public void handleInput(MessageIn message) {
-        Message requestObject = Message.fromString(message.getInput());
-        log.info("received " + requestObject.getCommand() + " from " + requestObject.sender);
-        Socket socket = message.getSocket();
         try {
+            Message requestObject = Message.fromString(message.getInput());
+            if (requestObject == null || requestObject.getCommand() == null) {
+                log.warn("Ignoring malformed message");
+                return;
+            }
+            log.info("received {} from {}", requestObject.getCommand(), requestObject.sender);
+            Socket socket = message.getSocket();
+            if (MessageAddPlayer.COMMAND.equals(requestObject.getCommand())) {
+                MessageAddPlayer addPlayer = new MessageAddPlayer(requestObject);
+                if (requestObject.sender == null || requestObject.sender.trim().isEmpty()
+                        || !requestObject.sender.equals(addPlayer.getPlayerName())) {
+                    log.warn("Rejected AddPlayer with mismatched sender");
+                    return;
+                }
+                handleAddPlayer(requestObject, socket);
+                return;
+            }
+
+            Player player = getAuthenticatedPlayer(message);
+            if (player == null) {
+                log.warn("Rejected message from an unauthenticated socket");
+                return;
+            }
             switch (requestObject.getCommand()) {
                 case MessageStartGame.COMMAND:
-                    handleStartGame(requestObject);
+                    if (isAdmin(player) && !gameRunning) {
+                        handleStartGame(requestObject);
+                    }
                     break;
                 case MessageSetStartPlayer.COMMAND:
-                    handleSetStartPlayer(requestObject);
+                    if (isAdmin(player)) {
+                        handleSetStartPlayer(requestObject);
+                    }
                     break;
                 case MessageConfiguration.COMMAND:
-                    handleConfiguration(requestObject);
-                    break;
-                case MessageAddPlayer.COMMAND:
-                    handleAddPlayer(requestObject, socket);
+                    if (isAdmin(player)) {
+                        handleConfiguration(requestObject);
+                    }
                     break;
                 case MessagePlayerList.CHANGE_ORDER:
-                    handleChangePlayerOrder(requestObject);
+                    if (isAdmin(player) && !gameRunning) {
+                        handleChangePlayerOrder(requestObject);
+                    }
                     break;
                 case MessagePutCard.COMMAND:
                     handlePutCard(requestObject);
                     break;
                 case MessageAbortGame.COMMAND:
-                    endIt();
+                    if (isAdmin(player)) {
+                        endIt();
+                    }
                     break;
                 case MessageReadyForNextRound.COMMAND:
-                    handleReadyForNextRound(requestObject);
+                    MessageReadyForNextRound ready = new MessageReadyForNextRound(requestObject);
+                    if (ready.getPlayerNumber() == player.getNumber()) {
+                        handleReadyForNextRound(requestObject);
+                    }
                     break;
                 case MessageAdminRequest.COMMAND:
-                    handleAdminRequest(requestObject);
+                    if (isAdmin(player)) {
+                        handleAdminRequest(requestObject);
+                    }
                     break;
             }
         } catch (Exception ex) {
-            log.error(ex.toString());
+            log.warn("Rejected invalid message", ex);
         }
+    }
+
+    protected Player getAuthenticatedPlayer(MessageIn message) {
+        if (message == null || message.getSocket() == null) {
+            return null;
+        }
+        Message requestObject = Message.fromString(message.getInput());
+        if (requestObject == null || requestObject.sender == null) {
+            return null;
+        }
+        return players.stream()
+                .filter(player -> player.getSocket() == message.getSocket()
+                        && player.getName().equals(requestObject.sender))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private boolean isAdmin(Player player) {
+        String currentAdmin = adminName;
+        if (currentAdmin == null && !players.isEmpty()) {
+            currentAdmin = players.get(0).getName();
+        }
+        return player.getName().equals(currentAdmin);
     }
 
     private void handleSetStartPlayer(Message message) {
         MessageSetStartPlayer messageSetStartPlayer = new MessageSetStartPlayer(message);
-        beginner = messageSetStartPlayer.getPlayerNumber();
+        int playerNumber = messageSetStartPlayer.getPlayerNumber();
+        if (playerNumber >= 0 && playerNumber < players.size()
+                && players.get(playerNumber).isNotSpectator()) {
+            beginner = playerNumber;
+        }
     }
 
     private void EndServer() {
@@ -135,8 +196,14 @@ public class BaseServer implements IServerMessageHandler {
 
     private void handleStartGame(Message message) {
         MessageStartGame messageStartGame = new MessageStartGame(message);
+        Statics.game requestedGame = messageStartGame.getGame();
+        int requiredPlayers = requestedGame == Statics.game.DOKO ? 4 : 3;
+        if (players.size() < requiredPlayers) {
+            log.warn("Rejected start request: not enough players");
+            return;
+        }
         this.setAdmin(players.get(0).getName());
-        this.gameType = messageStartGame.getGame();
+        this.gameType = requestedGame;
         switch (this.gameType) {
             case DOKO:
                 new DokoServer(this).startGame();
@@ -157,13 +224,21 @@ public class BaseServer implements IServerMessageHandler {
     }
 
     protected void handleReadyForNextRound(Message message) {
-        if (wait4NextRound) {
-            MessageReadyForNextRound messageReadyForNextRound = new MessageReadyForNextRound(message);
-            readyMap.put(messageReadyForNextRound.getPlayerNumber(), true);
-            players.stream().filter(Player::isAdmin).forEach(p -> p.queue(new MessageDisplayMessage(
-                    players.get(messageReadyForNextRound.getPlayerNumber()).getName() + " ist bereit")));
+        if (!wait4NextRound || readyMap == null) {
+            return;
         }
-        if (readyMap.values().stream().allMatch(p -> p)) {
+        MessageReadyForNextRound readyMessage = new MessageReadyForNextRound(message);
+        int playerNumber = readyMessage.getPlayerNumber();
+        if (playerNumber < 0 || playerNumber >= players.size()
+                || !readyMap.containsKey(playerNumber)
+                || Boolean.TRUE.equals(readyMap.get(playerNumber))) {
+            return;
+        }
+        readyMap.put(playerNumber, true);
+        players.stream().filter(Player::isAdmin).forEach(p -> p.queue(new MessageDisplayMessage(
+                players.get(playerNumber).getName() + Constants.IS_READY)));
+        if (!readyMap.isEmpty() && readyMap.values().stream().allMatch(Boolean.TRUE::equals)) {
+            wait4NextRound = false;
             nextGame();
         }
     }
@@ -183,10 +258,17 @@ public class BaseServer implements IServerMessageHandler {
 
     private void handleChangePlayerOrder(Message message) {
         MessagePlayerList messagePlayerList = new MessagePlayerList(message);
+        List<String> requestedOrder = messagePlayerList.getPlayerNamesList();
+        if (requestedOrder.size() != players.size()
+                || requestedOrder.stream().distinct().count() != players.size()
+                || !requestedOrder.containsAll(players.stream().map(Player::getName).collect(Collectors.toList()))) {
+            log.warn("Rejected invalid player order");
+            return;
+        }
         List<Player> pList = new ArrayList<>();
         List<String> sList = new ArrayList<>();
-        messagePlayerList.getPlayerNamesList().forEach(s -> {
-            pList.add(players.stream().filter(p -> p.getName().equals(s)).findFirst().get());
+        requestedOrder.forEach(s -> {
+            players.stream().filter(p -> p.getName().equals(s)).findFirst().ifPresent(pList::add);
             sList.add(s);
         });
         players.clear();
@@ -198,29 +280,42 @@ public class BaseServer implements IServerMessageHandler {
     }
 
     private void handleAddPlayer(Message message, Socket socket) {
+        if (socket == null) {
+            return;
+        }
         MessageAddPlayer messageAddPlayer = new MessageAddPlayer(message);
         String name = messageAddPlayer.getPlayerName();
-        if (players.stream().noneMatch(player -> player.getName().equals(name))) {
+        if (name == null || name.trim().isEmpty()) {
+            return;
+        }
+        Player existingPlayer = players.stream()
+                .filter(player -> player.getName().equals(name))
+                .findFirst()
+                .orElse(null);
+        if (existingPlayer == null) {
             players.add(new Player(messageAddPlayer.getPlayerName(),
                     players.size(), socket, false, comServer));
             List<String> list = new ArrayList<>();
             players.forEach(p -> list.add(p.getName()));
             send2All(MessagePlayerList.playersInLobby(list));
         } else {
-            players.stream().filter(player -> player.getName().equals(name)).findFirst().ifPresent(player -> {
-                player.setSocket(socket);
-                if (gameRunning) {
-                    updateReconnectedPlayer(player);
-                } else {
-                    List<String> list = new ArrayList<>();
-                    players.forEach(p -> list.add(p.getName()));
-                    player.queue(MessagePlayerList.playersInLobby(list));
-                }
-            });
+            Socket oldSocket = existingPlayer.getSocket();
+            if (oldSocket != socket && oldSocket != null && !oldSocket.isClosed()) {
+                log.warn("Rejected reconnect while previous socket is still active");
+                return;
+            }
+            existingPlayer.setSocket(socket);
+            if (gameRunning) {
+                updateReconnectedPlayer(existingPlayer);
+            } else {
+                List<String> list = new ArrayList<>();
+                players.forEach(p -> list.add(p.getName()));
+                existingPlayer.queue(MessagePlayerList.playersInLobby(list));
+            }
         }
 
-        queueOut(players.stream().filter(player -> player.getName().equals(name)).findFirst().get(),
-                new MessageGetVersion("Server", Statics.VERSION));
+        players.stream().filter(player -> player.getName().equals(name)).findFirst()
+                .ifPresent(player -> queueOut(player, new MessageGetVersion("Server", Statics.VERSION)));
     }
 
     protected void updateReconnectedPlayer(Player player) {

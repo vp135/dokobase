@@ -1,16 +1,21 @@
 package base.game.doko;
 
+import base.Constants;
 import base.Statics;
 import base.game.BaseServer;
 import base.game.Card;
 import base.game.Player;
 import base.messages.*;
 import base.messages.doko.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static base.messages.doko.MessageGameSelected.GAMES.*;
@@ -32,6 +37,8 @@ public class DokoServer extends BaseServer {
     private int armutplayer = -1;
     private int hochzeitSpieler = -1;
     private List<Player> players2Ask = new ArrayList<>();
+    private Player pendingArmutPlayer;
+    private Player armutReceiver;
     private boolean wait4Partner;
 
 
@@ -46,8 +53,31 @@ public class DokoServer extends BaseServer {
 
     @Override
     public void handleInput(MessageIn message) {
+        Message requestObject;
+        try {
+            requestObject = Message.fromString(message.getInput());
+        } catch (Exception ex) {
+            log.warn("Rejected malformed Doppelkopf message", ex);
+            return;
+        }
+        if (requestObject == null || requestObject.getCommand() == null) {
+            return;
+        }
+        if (MessageAddPlayer.COMMAND.equals(requestObject.getCommand())) {
+            super.handleInput(message);
+            return;
+        }
+        Player player = getAuthenticatedPlayer(message);
+        try {
+            if (player == null || !isValidGameMessage(player, requestObject)) {
+                log.warn(Constants.REJECTED_UNAUTHORIZED_OR_INVALID_DOPPELKOPF_ACTION);
+                return;
+            }
+        } catch (RuntimeException ex) {
+            log.warn(Constants.REJECTED_UNAUTHORIZED_OR_INVALID_DOPPELKOPF_ACTION);
+            return;
+        }
         super.handleInput(message);
-        Message requestObject = Message.fromString(message.getInput());
         try {
             switch (requestObject.getCommand()) {
                 case MessageGameSelected.COMMAND:
@@ -66,22 +96,122 @@ public class DokoServer extends BaseServer {
                     schwein = true;
                     break;
                 case MessageCardsReturned.COMMAND:
+                    armutReceiver = null;
                     runGame(beginner);
                     break;
             }
         } catch (Exception ex) {
-            log.error(requestObject + " => " + ex);
+            log.error("Failed to process request {}", requestObject, ex);
         }
+    }
+
+    private boolean isValidGameMessage(Player player, Message message) {
+        switch (message.getCommand()) {
+            case MessagePutCard.COMMAND:
+                return isValidCardPlay(player, message);
+            case MessageGameSelected.COMMAND:
+                MessageGameSelected selection = new MessageGameSelected(message);
+                return wait4Gesund && player.isNotSpectator()
+                        && selection.getPlayerNumber() == player.getNumber();
+            case MessageCurrentStich.LAST:
+            case MessageCurrentStich.SPECIFIC:
+                return new MessageCurrentStich(message).getPlayerNumber() == player.getNumber();
+            case MessageGetArmut.COMMAND:
+                return pendingArmutPlayer == player
+                        && new MessageGetArmut(message).getPlayerNumber() == player.getNumber();
+            case MessageSendCards.COMMAND:
+                MessageSendCards cards = new MessageSendCards(message);
+                if (MessageSendCards.RICH.equals(cards.getReceiver())) {
+                    return player.getNumber() == armutplayer
+                            && selectedGame == ARMUT
+                            && hasArmutCardsFromHand(player, message.getParams().getAsJsonArray(Constants.CARDS));
+                }
+                return MessageSendCards.POOR.equals(cards.getReceiver())
+                        && selectedGame == ARMUT
+                        && armutReceiver == player
+                        && armutCards != null
+                        && hasCardsFromHand(player, message.getParams().getAsJsonArray(Constants.CARDS),
+                        armutCards.size());
+            case MessageCardsReturned.COMMAND:
+                return player.getNumber() == armutplayer && armutReceiver != null;
+            case MessageSchweinExists.COMMAND:
+                return (selectedGame == NORMAL || selectedGame == KARO || selectedGame == ARMUT)
+                        && player.getHand() != null
+                        && player.getHand().stream().filter(card ->
+                        card.suit.equals(Statics.KARO) && card.kind.equals(Statics.ASS)).count() >= 2;
+            default:
+                return true;
+        }
+    }
+
+    private boolean isValidCardPlay(Player player, Message message) {
+        MessagePutCard putCard = new MessagePutCard(message);
+        JsonArray cardNumber = new JsonArray();
+        JsonElement cardNumberElement = message.getParams().get(Constants.CARD_NUMBER);
+        if (cardNumberElement == null) {
+            return false;
+        }
+        cardNumber.add(cardNumberElement);
+        if (!gameRunning || wait4Gesund || !player.isNotSpectator()
+                || putCard.getPlayerNumber() != player.getNumber()
+                || putCard.getPlayerNumber() != currentPlayer
+                || !hasCardsFromHand(player, cardNumber, 1)) {
+            return false;
+        }
+        if (!c.other.bedienen || stich == null || stich.getCardMap().isEmpty()
+                || stich.getCardMap().size() > 3) {
+            return true;
+        }
+        Card leadCard = stich.getCardMap().keySet().stream()
+                .filter(card -> card.playOrder == 0)
+                .findFirst()
+                .orElse(null);
+        if (leadCard == null) {
+            return true;
+        }
+        boolean ledTrump = DokoCards.isTrumpf(leadCard, selectedGame);
+        return player.getHand().stream().noneMatch(card -> ledTrump
+                ? DokoCards.isTrumpf(card, selectedGame)
+                : card.suit.equals(leadCard.suit))
+                || (ledTrump
+                ? DokoCards.isTrumpf(putCard.getCard(Statics.game.DOKO), selectedGame)
+                : putCard.getCard(Statics.game.DOKO).suit.equals(leadCard.suit));
+    }
+
+    private boolean hasCardsFromHand(Player player, JsonArray cardNumbers, int expectedCount) {
+        if (cardNumbers == null || cardNumbers.size() != expectedCount || player.getHand() == null) {
+            return false;
+        }
+        Set<Integer> uniqueCards = new HashSet<>();
+        for (JsonElement element : cardNumbers) {
+            int cardNumber;
+            try {
+                cardNumber = element.getAsInt();
+            } catch (RuntimeException ex) {
+                return false;
+            }
+            if (cardNumber < 0 || cardNumber >= DokoCards.ALL_CARDS.size()
+                    || !uniqueCards.add(cardNumber)
+                    || player.getHand().stream().noneMatch(card -> card.cardNumber == cardNumber)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean hasArmutCardsFromHand(Player player, JsonArray cardNumbers) {
+        return cardNumbers != null && cardNumbers.size() <= 3
+                && hasCardsFromHand(player, cardNumbers, cardNumbers.size());
     }
 
 
     private void handleCurrentStich(Message requestObject) {
-        if (stichList.size() > 0) {
+        if (!stichList.isEmpty()) {
             try {
                 MessageCurrentStich cs = new MessageCurrentStich(stichList.get(stichList.size() - 1).getCardMap(), MessageCurrentStich.LAST);
                 queueOut(players.get(new MessageCurrentStich(requestObject).getPlayerNumber()), cs);
             } catch (Exception ex) {
-                log.warn(ex.toString());
+                log.warn("Failed to handle Doppelkopf action", ex);
             }
         }
     }
@@ -89,7 +219,10 @@ public class DokoServer extends BaseServer {
 
     private void handleGetArmut(Message requestObject) {
         MessageGetArmut messageGetArmut = new MessageGetArmut(requestObject);
+        Player respondingPlayer = players.get(messageGetArmut.getPlayerNumber());
+        pendingArmutPlayer = null;
         if (messageGetArmut.getsArmut()) {
+            armutReceiver = respondingPlayer;
             queueOut(players.get(messageGetArmut.getPlayerNumber()),
                     new MessageSendCards(armutCards, MessageSendCards.RICH));
             players.get(messageGetArmut.getPlayerNumber()).setRe(true);
@@ -98,6 +231,7 @@ public class DokoServer extends BaseServer {
                             Statics.getString(Statics.ARMUT_ACCEPT,
                                     players.get(messageGetArmut.getPlayerNumber()).getName()))));
         } else {
+            armutReceiver = null;
             send2All(new MessageDisplayMessage(
                     Statics.getString(Statics.ARMUT_REFUSE,
                             players.get(messageGetArmut.getPlayerNumber()).getName())));
@@ -136,7 +270,7 @@ public class DokoServer extends BaseServer {
                                 players.get(messageGameSelected.getPlayerNumber()).getName())));
             }
         }
-        if (gameSelection.keySet().size() > 3) {
+        if (!gameSelection.isEmpty() && gameSelection.size() > 3) {
             setGameToPlay(gameSelection);
         } else {
             StringBuilder s = new StringBuilder("Warte auf " + (4 - gameSelection.size()) + " Spieler");
@@ -180,7 +314,7 @@ public class DokoServer extends BaseServer {
                 try {
                     points.put(winner, points.get(winner) + stich.calculatePoints());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("Failed to calculate Doppelkopf trick points", e);
                 }
                 currentPlayer = winner;
                 if (wait4Partner) {
@@ -195,13 +329,13 @@ public class DokoServer extends BaseServer {
                     }
                 }
                 send2All(new MessageUpdateUserPanel(players.stream().filter(p -> p.getNumber() == winner)
-                        .findFirst().get().getName(), " hat Stich(e)"));
+                        .findFirst().get().getName(), Constants.HAT_STICHE));
                 if (currentTrickNumber > 9) {
                     endIt();
                     return;
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                log.error("Failed to resolve Doppelkopf trick", ex);
             }
         }
         if (currentTrickNumber < 11) {
@@ -263,13 +397,13 @@ public class DokoServer extends BaseServer {
 
     private void createListOfPotentialPartners() {
         players2Ask = new ArrayList<>();
-        log.info("Armutplayer= " + armutplayer);
+        log.info("Armutplayer= {}", armutplayer);
         int korrValue = 1;
         for (int i = 0; i < players.size() - 1; i++) {
-            log.info("korrValue= " + korrValue);
-            log.info("i= " + i);
+            log.info("korrValue= {}", korrValue);
+            log.info("i= {}", i);
             int p = i + armutplayer + korrValue;
-            log.info("p= " + p);
+            log.info("p= {}", p);
             if (p > players.size() - 1) {
                 korrValue -= players.size();
                 p = i + armutplayer + korrValue;
@@ -281,11 +415,13 @@ public class DokoServer extends BaseServer {
     }
 
     private void askNextPlayer2GetArmut() {
-        if (players2Ask.size() > 0) {
-            log.info("Ask " + players2Ask.get(0));
-            queueOut(players2Ask.get(0), new MessageGetArmut());
+        if (!players2Ask.isEmpty()) {
+            log.info("Ask {}", players2Ask.get(0));
+            pendingArmutPlayer = players2Ask.get(0);
+            queueOut(pendingArmutPlayer, new MessageGetArmut());
             players2Ask.remove(0);
         } else {
+            pendingArmutPlayer = null;
             send2All(new MessageDisplayMessage(Statics.getString(Statics.NEU_GEBEN)));
             shuffleCards();
         }
@@ -317,7 +453,9 @@ public class DokoServer extends BaseServer {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.warn("Interrupted before shuffling cards", e);
+                Thread.currentThread().interrupt();
+                return;
             }
             shuffleCards();
         } else if (selection.containsValue(DAMEN)
@@ -342,8 +480,8 @@ public class DokoServer extends BaseServer {
                     selectedGame = selection.get(checkPlayer);
                     aufspieler = checkPlayer;
                     send2All(new MessageAnnounceSpectator(spectator, aufspieler));
-                    send2All(new MessageUpdateUserPanel(players.get(beginner).getName(), ""));
-                    send2All(new MessageUpdateUserPanel(players.get(aufspieler).getName(), ""));
+                    send2All(new MessageUpdateUserPanel(players.get(beginner).getName(), Constants.EMPTY_STRING));
+                    send2All(new MessageUpdateUserPanel(players.get(aufspieler).getName(), Constants.EMPTY_STRING));
                     send2All(new MessageDisplayMessage(
                             Statics.getString(
                                     Statics.SOLO, players.get(aufspieler).getName(),
@@ -395,7 +533,7 @@ public class DokoServer extends BaseServer {
     @Override
     protected void shuffleCards() {
         for (Player player1 : players) {
-            send2All(new MessageUpdateUserPanel(player1.getName(), ""));
+            send2All(new MessageUpdateUserPanel(player1.getName(), Constants.EMPTY_STRING));
         }
         stichList = new ArrayList<>();
         random = new Random(System.currentTimeMillis());
@@ -408,6 +546,8 @@ public class DokoServer extends BaseServer {
         }
         wait4Gesund = true;
         armutplayer = -1;
+        pendingArmutPlayer = null;
+        armutReceiver = null;
         schwein = false;
         stich = null;
         gameSelection = new HashMap<>();
@@ -445,9 +585,9 @@ public class DokoServer extends BaseServer {
 
     @Override
     public String toString() {
-        return "<html>" + selectedGame + "<br>" +
-                spectator + "<br>" +
-                currentPlayer + "<br>";
+        return Constants.HTML_OPEN + selectedGame + Constants.HTML_BREAK +
+                spectator + Constants.HTML_BREAK +
+                currentPlayer + Constants.HTML_BREAK;
     }
 
     @Override
@@ -467,7 +607,7 @@ public class DokoServer extends BaseServer {
         } else if (wait4NextRound) {
             readyMap.put(player.getNumber(), true);
             players.stream().filter(Player::isAdmin).forEach(p ->
-                    p.queue(new MessageDisplayMessage(player.getName() + " ist bereit")));
+                    p.queue(new MessageDisplayMessage(player.getName() + Constants.IS_READY)));
         } else {
             player.queue(new MessageWait4Player(players.get(currentPlayer).getName()));
         }

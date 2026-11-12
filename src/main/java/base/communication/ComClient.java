@@ -1,11 +1,13 @@
 package base.communication;
 
+import base.Constants;
 import base.config.Configuration;
 import base.helper.AutoResetEvent;
-import base.helper.Logger;
+import base.helper.Loggers;
 import base.interfaces.IClientMessageHandler;
 import base.messages.Message;
 import base.messages.MessageAddPlayer;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -38,7 +40,7 @@ public class ComClient {
 
 
     public ComClient(Configuration c, IClientMessageHandler client) {
-        log = new Logger("Client", c.logLevel, true, c.logType);
+        log = Loggers.client(c.connection.name);
         this.hostname = c.connection.server;
         this.port = c.connection.port;
         this.client = client;
@@ -49,7 +51,7 @@ public class ComClient {
     }
 
     public ComClient(Configuration c, IClientMessageHandler client, String name) {
-        log = new Logger("name", c.logLevel, true, c.logType);
+        log = Loggers.client(name);
         this.hostname = c.connection.server;
         this.port = c.connection.port;
         this.client = client;
@@ -73,7 +75,7 @@ public class ComClient {
                 }
             } catch (IOException ex) {
                 if (!connection.isClosed()) {
-                    log.info("Connection to Server closed: " + ex);
+                    log.info("Connection to Server closed", ex);
                 }
             } finally {
                 closeConnection(connection);
@@ -89,7 +91,7 @@ public class ComClient {
                 try {
                     evIn.waitOne(TIMEOUT);
                     while (inMessages.peek() != null) {
-                        log.info("received " + inMessages.peek().getCommand() + " from Server");
+                        log.info("received {} from Server", inMessages.peek().getCommand());
                         client.handleInput(inMessages.poll());
                     }
                 } catch (InterruptedException e) {
@@ -141,7 +143,7 @@ public class ComClient {
                 }
             }
         });
-        outThread.setName("Client2Server("+name+")");
+        outThread.setName("Client2Server("+name+Constants.CLOSE_PARENTHESIS);
         outThread.start();
     }
 
@@ -172,9 +174,9 @@ public class ComClient {
                     try {
                         connection.close();
                     } catch (IOException closeException) {
-                        log.warn(closeException.toString());
+                        log.warn("Failed to close connection", closeException);
                     }
-                    log.warn("Could not connect to Server: " + e);
+                    log.warn("Could not connect to Server", e);
                     try {
                         Thread.sleep(retryDelay);
                     } catch (InterruptedException interruptedException) {
@@ -186,7 +188,7 @@ public class ComClient {
             wait.set(false);
             connecting.set(false);
             evOut.set();
-        }, "openConnection(" + name + ")").start();
+        }, "openConnection(" + name + Constants.CLOSE_PARENTHESIS).start();
 
     }
 
@@ -219,7 +221,7 @@ public class ComClient {
         try {
             connection.close();
         } catch (IOException ex) {
-            log.warn(ex.toString());
+            log.warn("Connection attempt failed", ex);
         } finally {
             if (socket == connection) {
                 socket = null;

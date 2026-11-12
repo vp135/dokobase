@@ -1,5 +1,6 @@
 package base.game.doko;
 
+import base.Constants;
 import base.game.Player;
 import base.interfaces.IDialogInterface;
 
@@ -31,8 +32,8 @@ public class DokoEndDialog {
         calcPoints();
         StringBuilder builderRe = new StringBuilder();
         StringBuilder builderKontra = new StringBuilder();
-        builderRe.append("<html>");
-        builderKontra.append("<html>");
+        builderRe.append(Constants.HTML_OPEN);
+        builderKontra.append(Constants.HTML_OPEN);
         players.forEach(player -> player.setPoints(0));
 
         stichList.forEach(stich -> {
@@ -43,33 +44,33 @@ public class DokoEndDialog {
             if (players.get(stich.getWinner()).isRe()) {
                 builderRe.append(stich.getPoints());
                 builderRe.append(stich.getExtraPoints());
-                builderRe.append("(").append(players.get(stich.getWinner()).getName()).append(")");
+                builderRe.append(Constants.OPEN_PARENTHESIS).append(players.get(stich.getWinner()).getName()).append(Constants.CLOSE_PARENTHESIS);
             } else {
                 builderKontra.append(stich.getPoints());
                 builderKontra.append(stich.getExtraPoints());
-                builderKontra.append("(").append(players.get(stich.getWinner()).getName()).append(")");
+                builderKontra.append(Constants.OPEN_PARENTHESIS).append(players.get(stich.getWinner()).getName()).append(Constants.CLOSE_PARENTHESIS);
             }
-            builderKontra.append("<br>");
-            builderRe.append("<br>");
+            builderKontra.append(Constants.HTML_BREAK);
+            builderRe.append(Constants.HTML_BREAK);
         });
-        builderRe.append("</html>");
-        builderKontra.append("</html>");
+        builderRe.append(Constants.HTML_CLOSE);
+        builderKontra.append(Constants.HTML_CLOSE);
 
         StringBuilder builder1 = new StringBuilder();
         StringBuilder builder2 = new StringBuilder();
-        builder1.append("<html>Re(").append(rePoints).append(")<br><hr>");
-        builder2.append("<html>Kontra(").append(kontraPoints).append(")<br><hr>");
+        builder1.append(Constants.HTML_RE).append(rePoints).append(Constants.HTML_CLOSE_PAREN_BREAK_AND_RULE);
+        builder2.append(Constants.HTML_KONTRA).append(kontraPoints).append(Constants.HTML_CLOSE_PAREN_BREAK_AND_RULE);
         players.forEach(player -> {
             if (player.isNotSpectator()) {
                 if (player.isRe()) {
-                    builder1.append(player.getName()).append("(").append(player.getPoints()).append(")").append("<br>");
+                    builder1.append(player.getName()).append(Constants.OPEN_PARENTHESIS).append(player.getPoints()).append(Constants.CLOSE_PARENTHESIS).append(Constants.HTML_BREAK);
                 } else {
-                    builder2.append(player.getName()).append("(").append(player.getPoints()).append(")").append("<br>");
+                    builder2.append(player.getName()).append(Constants.OPEN_PARENTHESIS).append(player.getPoints()).append(Constants.CLOSE_PARENTHESIS).append(Constants.HTML_BREAK);
                 }
             }
         });
-        builder1.append("</html>");
-        builder2.append("</html>");
+        builder1.append(Constants.HTML_CLOSE);
+        builder2.append(Constants.HTML_CLOSE);
 
         reString1 = builder1.toString();
         reString2 = builderRe.toString();
@@ -136,11 +137,11 @@ public class DokoEndDialog {
         JPanel bottomPanel;
         if (remaining > 0) {
             bottomPanel = new JPanel(new GridLayout(2, 1));
-            bottomPanel.add(new JLabel(String.format("Rest: %s", remaining)));
+            bottomPanel.add(new JLabel(String.format(Constants.REST_FORMAT, remaining)));
         } else {
             bottomPanel = new JPanel(new GridLayout(1, 1));
         }
-        buttonOK = new JButton("OK");
+        buttonOK = new JButton(Constants.OK);
         bottomPanel.add(buttonOK);
 
         panel.add(panelTop, BorderLayout.NORTH);

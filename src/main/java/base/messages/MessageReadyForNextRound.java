@@ -1,12 +1,13 @@
 package base.messages;
 
+import base.Constants;
 public class MessageReadyForNextRound extends Message {
 
-    public final static String COMMAND = "ReadyForNextRound";
+    public final static String COMMAND = Constants.READY_FOR_NEXT_ROUND_COMMAND;
 
     public MessageReadyForNextRound(int p) {
         this.command = COMMAND;
-        this.params.addProperty("player", p);
+        this.params.addProperty(Constants.PLAYER, p);
     }
 
     public MessageReadyForNextRound(Message message) {
@@ -15,6 +16,6 @@ public class MessageReadyForNextRound extends Message {
     }
 
     public int getPlayerNumber() {
-        return params.get("player").getAsInt();
+        return params.get(Constants.PLAYER).getAsInt();
     }
 }

@@ -1,8 +1,11 @@
 package base.config;
 
+import base.Constants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -11,15 +14,13 @@ import java.nio.file.Paths;
 
 public class Configuration {
 
+    private static final Logger log = LoggerFactory.getLogger(Configuration.class);
 
     public final ConConfig connection = new ConConfig();
     public final UIConfig ui = new UIConfig();
     public SkatConfig skat = new SkatConfig();
     public DokoConfig doko = new DokoConfig();
     public OtherConfig other = new OtherConfig();
-    public int logLevel = 1;
-    public int logType = 0;
-
 
     public Configuration() {
 
@@ -27,15 +28,14 @@ public class Configuration {
 
     public static Configuration fromFile() {
         StringBuilder builder = new StringBuilder();
-        if (Files.exists(Paths.get("config.json"))) {
-            try {
-                FileReader reader = new FileReader("config.json");
+        if (Files.exists(Paths.get(Constants.CONFIG_JSON))) {
+            try (FileReader reader = new FileReader(Constants.CONFIG_JSON)) {
                 int c;
                 while ((c = reader.read()) != -1) {
                     builder.append((char) c);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Failed to read configuration file", e);
             }
             return fromString(builder.toString());
         } else {
@@ -44,12 +44,12 @@ public class Configuration {
     }
 
     public void saveConfig() {
-        try (FileWriter fw = new FileWriter("config.json");
+        try (FileWriter fw = new FileWriter(Constants.CONFIG_JSON);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
             out.println(this.toPrettyJson());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to save configuration file", e);
         }
     }
 

@@ -1,5 +1,6 @@
 package base.game.skat;
 
+import base.Constants;
 import base.Statics;
 import base.game.Card;
 import base.game.Player;
@@ -122,11 +123,11 @@ public class Stich {
         StringBuilder s = new StringBuilder();
         cardMap.keySet().forEach(card -> s
                 .append(cardMap.get(card))
-                .append(":")
+                .append(Constants.COLON)
                 .append(card.suit)
-                .append(" ")
+                .append(Constants.SPACE)
                 .append(card.kind)
-                .append("\n"));
+                .append(Constants.NEWLINE));
         return s.toString();
     }
 
