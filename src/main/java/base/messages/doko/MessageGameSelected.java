@@ -1,15 +1,16 @@
 package base.messages.doko;
 
+import base.Constants;
 import base.messages.Message;
 
 public class MessageGameSelected extends Message {
 
-    public final static String COMMAND = "GameSelected";
+    public final static String COMMAND = Constants.DOKO_GAME_SELECTED_COMMAND;
 
     public MessageGameSelected(int p, GAMES game) {
         this.command = COMMAND;
-        this.params.addProperty("player", p);
-        this.params.addProperty("game", game.value);
+        this.params.addProperty(Constants.PLAYER, p);
+        this.params.addProperty(Constants.GAME, game.value);
     }
 
     public MessageGameSelected(Message message) {
@@ -18,11 +19,11 @@ public class MessageGameSelected extends Message {
     }
 
     public int getPlayerNumber() {
-        return params.get("player").getAsInt();
+        return params.get(Constants.PLAYER).getAsInt();
     }
 
     public GAMES getSelectedGame() {
-        return GAMES.getName(params.get("game").getAsInt());
+        return GAMES.getName(params.get(Constants.GAME).getAsInt());
     }
 
     public enum GAMES {

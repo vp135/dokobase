@@ -5,6 +5,8 @@ import base.game.Card;
 import base.game.doko.Compare;
 import base.game.doko.DokoCards;
 import base.messages.doko.MessageGameSelected;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +14,8 @@ import java.util.List;
 import java.util.Random;
 
 public class Assist {
+    private static final Logger log = LoggerFactory.getLogger(Assist.class);
+
     public Bucket playerBucket;
     public Bucket gameBucket;
     public MessageGameSelected.GAMES game;
@@ -127,7 +131,7 @@ public class Assist {
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Failed to calculate playable cards", ex);
         }
         return nmb;
     }

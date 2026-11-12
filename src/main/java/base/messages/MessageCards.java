@@ -1,24 +1,28 @@
 package base.messages;
 
+import base.Constants;
 import base.Statics;
 import base.game.Card;
 import base.game.doko.DokoCards;
 import base.game.skat.SkatCards;
 import base.messages.doko.MessageGameSelected;
 import com.google.gson.JsonArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MessageCards extends Message {
 
-    public final static String COMMAND = "Cards";
+    private static final Logger log = LoggerFactory.getLogger(MessageCards.class);
+    public final static String COMMAND = Constants.CARDS_COMMAND;
 
     public MessageCards(List<Card> cardList) {
         this.command = COMMAND;
         JsonArray array = new JsonArray();
         cardList.forEach(p -> array.add(p.cardNumber));
-        params.add("cards", array);
+        params.add(Constants.CARDS, array);
     }
 
     public MessageCards(Message message) {
@@ -29,12 +33,12 @@ public class MessageCards extends Message {
 
     public List<Card> getCards(Statics.game game) {
         List<Card> list = new ArrayList<>();
-        this.params.get("cards").getAsJsonArray().forEach(j -> {
+        this.params.get(Constants.CARDS).getAsJsonArray().forEach(j -> {
             switch (game) {
                 case DOKO:
                     Card card = DokoCards.ALL_CARDS.get(j.getAsInt());
                     card.trump = DokoCards.isTrumpf(card, MessageGameSelected.GAMES.NORMAL);
-                    System.out.println(card+":"+ card.trump);
+                    log.debug("Card {} is trump: {}", card, card.trump);
                     list.add(card);
                     break;
                 case SKAT:

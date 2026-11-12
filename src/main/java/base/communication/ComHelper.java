@@ -1,7 +1,8 @@
 package base.communication;
 
-import base.helper.Logger;
+import base.Constants;
 import base.messages.Message;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
@@ -21,18 +22,18 @@ public class ComHelper {
     public static boolean sendByTCP(Socket socket, Message message, Logger log) {
         if (socket != null && socket.isConnected() && !socket.isClosed() && !socket.isOutputShutdown()) {
             try {
-                byte[] payload = (message.toJson() + "\n").getBytes(StandardCharsets.UTF_8);
+                byte[] payload = (message.toJson() + Constants.NEWLINE).getBytes(StandardCharsets.UTF_8);
                 OutputStream out = socket.getOutputStream();
                 out.write(payload);
                 out.flush();
-                log.info("Sent " + message.getCommand());
+                log.info("Sent {}", message.getCommand());
                 return true;
             } catch (IOException ex) {
-                log.error(ex.toString());
+                log.error("Failed to send message", ex);
                 try {
                     socket.close();
                 } catch (IOException closeException) {
-                    log.warn(closeException.toString());
+                    log.warn("Failed to close socket after send failure", closeException);
                 }
                 return false;
             }

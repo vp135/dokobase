@@ -1,5 +1,6 @@
 package base.game;
 
+import base.Constants;
 import base.Statics;
 import base.communication.ComClient;
 import base.config.Configuration;
@@ -9,7 +10,7 @@ import base.game.doko.SortHand;
 import base.game.doko.Stich;
 import base.game.doko.assist.Assist;
 import base.game.doko.assist.Bucket;
-import base.helper.Logger;
+import base.helper.Loggers;
 import base.interfaces.IClientMessageHandler;
 import base.messages.*;
 import base.messages.doko.MessageGameEnd;
@@ -22,6 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static base.messages.doko.MessageGameSelected.GAMES.*;
+import org.slf4j.Logger;
 
 public class NPCClient implements IClientMessageHandler {
 
@@ -52,12 +54,12 @@ public class NPCClient implements IClientMessageHandler {
         this.comClient = new ComClient(config, this, playerName);
         this.playerName = playerName;
         this.assist = new Assist();
-        log = new Logger(playerName, 0, true, 0);
+        log = Loggers.client(playerName);
     }
 
     @Override
     public void handleInput(Message message) {
-        System.out.println(this.playerName + ":" + message.getCommand());
+        log.info("{}: {}", playerName, message.getCommand());
         switch (message.getCommand()) {
             case MessageStartGame.COMMAND:
                 game = (new MessageStartGame(message)).getGame();
@@ -93,7 +95,7 @@ public class NPCClient implements IClientMessageHandler {
     private void handleGameSelected(Message message) {
         MessageGameSelected messageGameSelected = new MessageGameSelected(message);
         selectedGame = messageGameSelected.getSelectedGame();
-        if (hand != null && hand.size() > 0) {
+        if (hand != null && !hand.isEmpty()) {
             hand = SortHand.sort(hand, selectedGame, schweinExists);
             if (selectedGame == NORMAL
                     || selectedGame == KARO
@@ -133,7 +135,7 @@ public class NPCClient implements IClientMessageHandler {
     }
 
     private void handleWait4PlayerDoko(Message message) {
-        if (message.getParams().get("player").getAsString().equals(playerName)) {
+        if (message.getParams().get(Constants.PLAYER).getAsString().equals(playerName)) {
             Optional<Card> optCard;
             if (mustPlay != null) {
                 if (mustPlay.trump) {
@@ -154,7 +156,7 @@ public class NPCClient implements IClientMessageHandler {
             }
             optCard.ifPresent(card -> {
                 send(new MessagePutCard(players.indexOf(playerName), card), true);
-                log.info(String.format("played %s", card));
+                log.info("played {}", card);
                 hand.remove(card);
             });
             assist.playerBucket = new Bucket(hand, selectedGame, false);
@@ -253,7 +255,7 @@ public class NPCClient implements IClientMessageHandler {
                     }
                 } else if (!mustPlay.suit.equals(card.suit)) {
                     pList.get(messagePutCard.getPlayerNumber()).setSuit(mustPlay.suit, 0);
-                    log.info(pList.get(messagePutCard.getPlayerNumber()).name + " hat keine " + mustPlay.suit + " mehr");
+                    log.info("{} hat keine {} mehr", pList.get(messagePutCard.getPlayerNumber()).name, mustPlay.suit);
                 }
             }
             if (currentCardsOnTable == 1) {
@@ -266,7 +268,7 @@ public class NPCClient implements IClientMessageHandler {
                 currentCardsOnTable = 0;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Failed to handle NPC game message", ex);
         }
     }
 
@@ -460,7 +462,9 @@ public class NPCClient implements IClientMessageHandler {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.warn("Interrupted before sending delayed message", e);
+                Thread.currentThread().interrupt();
+                return;
             }
         }
         comClient.queueOut(message);

@@ -1,5 +1,6 @@
 package base.messages;
 
+import base.Constants;
 import base.Statics;
 import base.game.Card;
 import base.game.doko.DokoCards;
@@ -10,9 +11,9 @@ import java.util.Map;
 
 public class MessageCurrentStich extends Message {
 
-    public final static String CURRENT = "CurrentStich";
-    public final static String LAST = "LastStich";
-    public final static String SPECIFIC = "SpecificStich";
+    public final static String CURRENT = Constants.CURRENT_STICH_CURRENT;
+    public final static String LAST = Constants.CURRENT_STICH_LAST;
+    public final static String SPECIFIC = Constants.CURRENT_STICH_SPECIFIC;
 
 
     public MessageCurrentStich(Map<Card, Integer> map) {
@@ -22,7 +23,7 @@ public class MessageCurrentStich extends Message {
 
     public MessageCurrentStich(Map<Card, Integer> map, int player, boolean isLast) {
         this(map);
-        this.params.addProperty("player", player);
+        this.params.addProperty(Constants.PLAYER, player);
         if (isLast) {
             this.command = LAST;
         }
@@ -55,7 +56,7 @@ public class MessageCurrentStich extends Message {
 
 
     public int getPlayerNumber() {
-        return params.get("player").getAsInt();
+        return params.get(Constants.PLAYER).getAsInt();
     }
 
 }

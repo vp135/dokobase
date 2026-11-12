@@ -2,11 +2,12 @@ package base.communication;
 
 import base.config.Configuration;
 import base.helper.AutoResetEvent;
-import base.helper.Logger;
+import base.helper.Loggers;
 import base.interfaces.IServerMessageHandler;
 import base.messages.Message;
 import base.messages.MessageIn;
 import base.messages.MessageOut;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -31,7 +32,7 @@ public class ComServer {
 
 
     public ComServer(Configuration c) {
-        log = new Logger("Server", c.logLevel, true, c.logType);
+        log = Loggers.server();
         inMessageHandling();
         outMessageHandling();
         startTCPServer(c.connection.port);
@@ -43,9 +44,9 @@ public class ComServer {
             log.info("Creating ServerSocket...");
             try {
                 socket = new ServerSocket(port);
-                log.info("ServerSocket created: " + socket.getInetAddress() + ":" + socket.getLocalPort());
+                log.info("ServerSocket created: {}:{}", socket.getInetAddress(), socket.getLocalPort());
             } catch (IOException e) {
-                log.error("Socket creation failed: " + e);
+                log.error("Socket creation failed", e);
                 return;
             }
             while (true) {
@@ -71,7 +72,7 @@ public class ComServer {
                                 }
                             } catch (IOException e) {
                                 if (!connectionSocket.isClosed()) {
-                                    log.info("Client connection closed: " + e);
+                                    log.info("Client connection closed", e);
                                 }
                             } finally {
                                 closeSocket(connectionSocket);
@@ -82,7 +83,7 @@ public class ComServer {
                     if (socket.isClosed()) {
                         return;
                     }
-                    log.error(e.toString());
+                    log.error("Connection handling failed", e);
                 }
             }
         });
@@ -100,7 +101,9 @@ public class ComServer {
                         inMessages.poll();
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.warn("Server message handling interrupted", e);
+                    Thread.currentThread().interrupt();
+                    return;
                 }
             }
         }, "Client2Server").start();
@@ -153,7 +156,7 @@ public class ComServer {
         try {
             socket.close();
         } catch (IOException e) {
-            log.warn(e.toString());
+            log.warn("Server socket operation failed", e);
         }
     }
 

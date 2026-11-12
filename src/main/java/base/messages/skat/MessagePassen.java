@@ -1,14 +1,15 @@
 package base.messages.skat;
 
+import base.Constants;
 import base.messages.Message;
 
 public class MessagePassen extends Message {
 
-    public final static String COMMAND = "passen";
+    public final static String COMMAND = Constants.SKAT_PASSEN_COMMAND;
 
     public MessagePassen(String player) {
         this.command = COMMAND;
-        this.params.addProperty("player", player);
+        this.params.addProperty(Constants.PLAYER, player);
     }
 
     public MessagePassen(Message message) {
@@ -17,6 +18,6 @@ public class MessagePassen extends Message {
     }
 
     public String getPlayerName() {
-        return params.get("player").getAsString();
+        return params.get(Constants.PLAYER).getAsString();
     }
 }

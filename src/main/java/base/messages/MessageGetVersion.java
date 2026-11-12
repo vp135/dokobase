@@ -1,13 +1,14 @@
 package base.messages;
 
+import base.Constants;
 public class MessageGetVersion extends Message {
 
-    public final static String COMMAND = "getVersion";
+    public final static String COMMAND = Constants.GET_VERSION_COMMAND;
 
     public MessageGetVersion(String playername, String version) {
         this.command = COMMAND;
-        this.params.addProperty("player", playername);
-        this.params.addProperty("version", version);
+        this.params.addProperty(Constants.PLAYER, playername);
+        this.params.addProperty(Constants.VERSION, version);
     }
 
     public MessageGetVersion(Message message) {
@@ -16,10 +17,10 @@ public class MessageGetVersion extends Message {
     }
 
     public String getPlayerName() {
-        return params.get("player").getAsString();
+        return params.get(Constants.PLAYER).getAsString();
     }
 
     public String getVersion() {
-        return params.get("version").getAsString();
+        return params.get(Constants.VERSION).getAsString();
     }
 }

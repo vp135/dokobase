@@ -1,5 +1,6 @@
 package base.game.skat;
 
+import base.Constants;
 import base.Statics;
 import base.game.Card;
 import base.game.Player;
@@ -44,9 +45,9 @@ public class SkatEndDialog {
             players.forEach(player -> {
                 if (player.getNumber() == stich.getWinner()) {
                     player.addPoints(stich.getPoints());
-                    playerBuilder[stich.getWinner()].append(stich.getPoints()).append("<br>");
+                    playerBuilder[stich.getWinner()].append(stich.getPoints()).append(Constants.HTML_BREAK);
                 } else {
-                    playerBuilder[player.getNumber()].append("<br>");
+                    playerBuilder[player.getNumber()].append(Constants.HTML_BREAK);
                 }
             });
             remaining -= stich.getPoints();
@@ -57,11 +58,11 @@ public class SkatEndDialog {
                 if (player.getNumber() == stichList.get(stichList.size() - 1).getWinner()) {
                     player.addPoints(skatPoints);
                     remaining -= skatPoints;
-                    playerBuilder[player.getNumber()].append(skatPoints).append("(");
-                    playerBuilder[player.getNumber()].append(skat.get(0).toString()).append("|");
-                    playerBuilder[player.getNumber()].append(skat.get(1).toString()).append(")");
+                    playerBuilder[player.getNumber()].append(skatPoints).append(Constants.OPEN_PARENTHESIS);
+                    playerBuilder[player.getNumber()].append(skat.get(0).toString()).append(Constants.PIPE);
+                    playerBuilder[player.getNumber()].append(skat.get(1).toString()).append(Constants.CLOSE_PARENTHESIS);
                 } else {
-                    playerBuilder[player.getNumber()].append("<br>");
+                    playerBuilder[player.getNumber()].append(Constants.HTML_BREAK);
                 }
             });
         } else {
@@ -69,39 +70,39 @@ public class SkatEndDialog {
                 if (player.isRe()) {
                     remaining -= skatPoints;
                     player.addPoints(skatPoints);
-                    playerBuilder[player.getNumber()].append(skatPoints).append("(");
-                    playerBuilder[player.getNumber()].append(skat.get(0).toString()).append("|");
-                    playerBuilder[player.getNumber()].append(skat.get(1).toString()).append(")");
+                    playerBuilder[player.getNumber()].append(skatPoints).append(Constants.OPEN_PARENTHESIS);
+                    playerBuilder[player.getNumber()].append(skat.get(0).toString()).append(Constants.PIPE);
+                    playerBuilder[player.getNumber()].append(skat.get(1).toString()).append(Constants.CLOSE_PARENTHESIS);
                 } else {
-                    playerBuilder[player.getNumber()].append("<br>");
+                    playerBuilder[player.getNumber()].append(Constants.HTML_BREAK);
                 }
             });
         }
 
         for (int i = 0; i < players.size(); i++) {
-            playerBuilder[i].append("</html>");
+            playerBuilder[i].append(Constants.HTML_CLOSE);
         }
 
         if (game == MessageGameSelected.GAMES.Ramsch) {
-            reString1 = "";
-            kontraString1 = "";
+            reString1 = Constants.EMPTY_STRING;
+            kontraString1 = Constants.EMPTY_STRING;
         } else {
             rePoints += skatPoints;
             StringBuilder builder1 = new StringBuilder();
             StringBuilder builder2 = new StringBuilder();
-            builder1.append("<html>Re(").append(rePoints).append(")<br><hr>");
-            builder2.append("<html>Kontra(").append(kontraPoints).append(")<br><hr>");
+            builder1.append(Constants.HTML_RE).append(rePoints).append(Constants.HTML_CLOSE_PAREN_BREAK_AND_RULE);
+            builder2.append(Constants.HTML_KONTRA).append(kontraPoints).append(Constants.HTML_CLOSE_PAREN_BREAK_AND_RULE);
             players.forEach(player -> {
                 if (player.isNotSpectator()) {
                     if (player.isRe()) {
-                        builder1.append(player.getName()).append("(").append(player.getPoints()).append(")").append("<br><br>");
+                        builder1.append(player.getName()).append(Constants.OPEN_PARENTHESIS).append(player.getPoints()).append(Constants.CLOSE_PARENTHESIS).append("<br><br>");
                     } else {
-                        builder2.append(player.getName()).append("(").append(player.getPoints()).append(")").append("<br>");
+                        builder2.append(player.getName()).append(Constants.OPEN_PARENTHESIS).append(player.getPoints()).append(Constants.CLOSE_PARENTHESIS).append(Constants.HTML_BREAK);
                     }
                 }
             });
-            builder1.append("</html>");
-            builder2.append("</html>");
+            builder1.append(Constants.HTML_CLOSE);
+            builder2.append(Constants.HTML_CLOSE);
             reString1 = builder1.toString();
             kontraString1 = builder2.toString();
         }
@@ -109,13 +110,13 @@ public class SkatEndDialog {
         for (Player p : players) {
             if (p.isNotSpectator()) {
                 if (i == 0) {
-                    player1String = "<html>" + players.get(i).getName() + "(" + players.get(i).getPoints() + ")<br><hr>"
+                    player1String = Constants.HTML_OPEN + players.get(i).getName() + Constants.OPEN_PARENTHESIS + players.get(i).getPoints() + Constants.HTML_CLOSE_PAREN_BREAK_AND_RULE
                             + playerBuilder[p.getNumber()].toString();
                 } else if (i == 1) {
-                    player2String = "<html>" + players.get(i).getName() + "(" + players.get(i).getPoints() + ")<br><hr>"
+                    player2String = Constants.HTML_OPEN + players.get(i).getName() + Constants.OPEN_PARENTHESIS + players.get(i).getPoints() + Constants.HTML_CLOSE_PAREN_BREAK_AND_RULE
                             + playerBuilder[p.getNumber()].toString();
                 } else if (i == 2) {
-                    player3String = "<html>" + players.get(i).getName() + "(" + players.get(i).getPoints() + ")<br><hr>"
+                    player3String = Constants.HTML_OPEN + players.get(i).getName() + Constants.OPEN_PARENTHESIS + players.get(i).getPoints() + Constants.HTML_CLOSE_PAREN_BREAK_AND_RULE
                             + playerBuilder[p.getNumber()].toString();
                 }
             }
@@ -175,7 +176,7 @@ public class SkatEndDialog {
 
     public void createPanel() {
         panel = new JPanel(new BorderLayout());
-        if (!reString1.equals("") || !kontraString1.equals("")) {
+        if (!reString1.equals(Constants.EMPTY_STRING) || !kontraString1.equals(Constants.EMPTY_STRING)) {
             JPanel panelTop = new JPanel(new GridLayout(1, 2));
             panelTop.setBorder(BorderFactory.createLineBorder(Color.GRAY, 3));
             panelTop.add(new JLabel(reString1));
@@ -192,11 +193,11 @@ public class SkatEndDialog {
         JPanel bottomPanel;
         if (remaining > 0) {
             bottomPanel = new JPanel(new GridLayout(2, 1));
-            bottomPanel.add(new JLabel(String.format("Rest: %s", remaining)));
+            bottomPanel.add(new JLabel(String.format(Constants.REST_FORMAT, remaining)));
         } else {
             bottomPanel = new JPanel(new GridLayout(1, 1));
         }
-        buttonOK = new JButton("OK");
+        buttonOK = new JButton(Constants.OK);
         bottomPanel.add(buttonOK);
 
         panel.add(panelCenter, BorderLayout.CENTER);

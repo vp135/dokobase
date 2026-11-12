@@ -1,9 +1,11 @@
 package base.game.doko;
 
+import base.Constants;
 import base.Statics;
 import base.game.Card;
-import base.helper.Logger;
 import base.messages.doko.MessageGameSelected;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,7 +13,7 @@ import java.util.List;
 
 public class Compare {
 
-    private final static Logger log = new Logger(Compare.class.getName(), 1);
+    private static final Logger log = LoggerFactory.getLogger(Compare.class);
 
 
     public static Card getWinner(Card card1, Card card2, MessageGameSelected.GAMES game, boolean schwein) {
@@ -298,12 +300,11 @@ public class Compare {
             }
 
         }
-        log.error("Error");
+        log.error(Constants.ERROR);
         return second;
     }
 
     public static Card damen(Card first, Card second) {
-        //System.out.println(first.toString() +":"+ second.toString());
         switch (first.suit) {
             case Statics.KREUZ: {
                 switch (first.kind) {
@@ -488,12 +489,11 @@ public class Compare {
             }
 
         }
-        log.error("Error");
+        log.error(Constants.ERROR);
         return second;
     }
 
     public static Card buben(Card first, Card second) {
-        //System.out.println(first.toString() +":"+ second.toString());
         switch (first.suit) {
             case Statics.KREUZ: {
                 switch (first.kind) {
@@ -678,12 +678,11 @@ public class Compare {
             }
 
         }
-        log.error("Error");
+        log.error(Constants.ERROR);
         return second;
     }
 
     public static Card bubendamen(Card first, Card second) {
-        //System.out.println(first.toString() + ":" + second.toString());
         switch (first.suit) {
             case Statics.KREUZ: {
                 switch (first.kind) {
@@ -860,12 +859,11 @@ public class Compare {
             }
 
         }
-        log.error("Error");
+        log.error(Constants.ERROR);
         return second;
     }
 
     public static Card fleischlos(Card first, Card second) {
-        //System.out.println(first.toString() + ":" + second.toString());
         switch (first.suit) {
             case Statics.KREUZ: {
                 switch (first.kind) {
@@ -1037,12 +1035,11 @@ public class Compare {
                 break;
             }
         }
-        log.error("Error");
+        log.error(Constants.ERROR);
         return second;
     }
 
     public static Card kreuz(Card first, Card second) {
-        //System.out.println(first.toString() +":"+ second.toString());
         switch (first.suit) {
             case Statics.KREUZ: {
                 switch (first.kind) {
@@ -1259,12 +1256,11 @@ public class Compare {
             }
 
         }
-        log.error("Error");
+        log.error(Constants.ERROR);
         return second;
     }
 
     public static Card pik(Card first, Card second) {
-        //System.out.println(first.toString() +":"+ second.toString());
         switch (first.suit) {
             case Statics.KREUZ: {
                 switch (first.kind) {
@@ -1481,12 +1477,11 @@ public class Compare {
             }
 
         }
-        log.error("Error");
+        log.error(Constants.ERROR);
         return second;
     }
 
     public static Card herz(Card first, Card second) {
-        //System.out.println(first.toString() +":"+ second.toString());
         switch (first.suit) {
             case Statics.KREUZ: {
                 switch (first.kind) {
@@ -1693,7 +1688,7 @@ public class Compare {
                 break;
             }
         }
-        log.error("Error");
+        log.error(Constants.ERROR);
         return second;
     }
 

@@ -1,12 +1,13 @@
 package base.messages;
 
+import base.Constants;
 public class MessageSetStartPlayer extends Message {
 
-    public final static String COMMAND = "setStartPlayer";
+    public final static String COMMAND = Constants.SET_START_PLAYER_COMMAND;
 
     public MessageSetStartPlayer(int playerNumber) {
         this.command = COMMAND;
-        this.params.addProperty("playerNumber",playerNumber);
+        this.params.addProperty(Constants.PLAYER_NUMBER,playerNumber);
     }
 
     public MessageSetStartPlayer(Message message){
@@ -15,6 +16,6 @@ public class MessageSetStartPlayer extends Message {
     }
 
     public int getPlayerNumber(){
-        return this.params.get("playerNumber").getAsInt();
+        return this.params.get(Constants.PLAYER_NUMBER).getAsInt();
     }
 }

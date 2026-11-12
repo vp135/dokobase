@@ -1,5 +1,6 @@
 package base.game;
 
+import base.Constants;
 import base.Statics;
 
 import java.util.ArrayList;
@@ -62,6 +63,6 @@ public class Card {
     }
 
     public String toString() {
-        return (this.suit + " " + this.kind);
+        return (this.suit + Constants.SPACE + this.kind);
     }
 }

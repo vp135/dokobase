@@ -1,14 +1,19 @@
 package base.game;
 
+import base.Constants;
 import base.communication.ComServer;
 import base.helper.AutoResetEvent;
+import base.helper.Loggers;
 import base.messages.Message;
+import org.slf4j.Logger;
 
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Player {
+    private static final Logger log = Loggers.server();
+
     private final String name;
     private int number;
     private volatile Socket socket;
@@ -52,7 +57,7 @@ public class Player {
 
 
     public Player(String name, int number, Socket socket, boolean spectator, ComServer comServer) {
-        System.out.println("player:" + name);
+        log.info("Creating player {}", name);
         this.name = name;
         this.number = number;
         this.socket = socket;
@@ -125,9 +130,9 @@ public class Player {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("<html>" + name + "<br>" + number + "<br>");
+        StringBuilder s = new StringBuilder(Constants.HTML_OPEN + name + Constants.HTML_BREAK + number + Constants.HTML_BREAK);
         if (hand != null) {
-            hand.forEach(card -> s.append(card.toString()).append("<br>"));
+            hand.forEach(card -> s.append(card.toString()).append(Constants.HTML_BREAK));
         }
         return s.toString();
     }
@@ -174,7 +179,7 @@ public class Player {
                     return;
                 }
             }
-        }, "Server2Client(" + this.name + ")").start();
+        }, "Server2Client(" + this.name + Constants.CLOSE_PARENTHESIS).start();
     }
 
     public void removeCard(String farbe, String wert) {

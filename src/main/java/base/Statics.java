@@ -9,28 +9,28 @@ import java.util.Random;
 
 public class Statics {
 
-    public static final String KREUZ = "Kreuz";
-    public static final String PIK = "Pik";
-    public static final String HERZ = "Herz";
-    public static final String KARO = "Karo";
-    public static final String SIEBEN = "7";
-    public static final String ACHT = "8";
-    public static final String NEUN = "9";
-    public static final String ZEHN = "10";
-    public static final String BUBE = "Bube";
-    public static final String DAME = "Dame";
-    public static final String KOENIG = "Koenig";
-    public static final String ASS = "Ass";
-    public static final String TRUMPF = "Trumpf";
+    public static final String KREUZ = Constants.KREUZ;
+    public static final String PIK = Constants.PIK;
+    public static final String HERZ = Constants.HERZ;
+    public static final String KARO = Constants.KARO;
+    public static final String SIEBEN = Constants.SIEBEN;
+    public static final String ACHT = Constants.ACHT;
+    public static final String NEUN = Constants.NEUN;
+    public static final String ZEHN = Constants.ZEHN;
+    public static final String BUBE = Constants.BUBE;
+    public static final String DAME = Constants.DAME;
+    public static final String KOENIG = Constants.KOENIG;
+    public static final String ASS = Constants.ASS;
+    public static final String TRUMPF = Constants.TRUMPF;
 
     public enum game {
         DOKO,
         SKAT
     }
 
-    public static final String VERSION = "5.0.0";
+    public static final String VERSION = Constants.APP_VERSION;
 
-    public enum ADMINREQUESTS {
+    public enum ADMIN_REQUESTS {
         NOTHING(0),
         SET_START_PLAYER(1),
         SHUFFLE(10),
@@ -40,12 +40,12 @@ public class Statics {
 
         public final int value;
 
-        ADMINREQUESTS(int value) {
+        ADMIN_REQUESTS(int value) {
             this.value = value;
         }
 
-        public static ADMINREQUESTS getName(int val) {
-            for (ADMINREQUESTS request : ADMINREQUESTS.values()) {
+        public static ADMIN_REQUESTS getName(int val) {
+            for (ADMIN_REQUESTS request : ADMIN_REQUESTS.values()) {
                 if (request.value == val) {
                     return request;
                 }
@@ -74,11 +74,13 @@ public class Statics {
     ));
 
     public final static List<String> SOLO = new ArrayList<>(Arrays.asList(
-            "%s spielt ein %s"
+            "%s spielt ein %s",
+            "%s spielt ein %s Solo"
     ));
 
     public final static List<String> ARMUT_GIVE = new ArrayList<>(Arrays.asList(
-            "%s hat nur %d Trumpf"
+            "%s hat nur %d Trumpf",
+            "%s hat eine Armut und gibt %d Trumpf ab"
     ));
 
     public final static List<String> KOENIGE = new ArrayList<>(Arrays.asList(
@@ -92,7 +94,8 @@ public class Statics {
     ));
 
     public final static List<String> ARMUT_ACCEPT = new ArrayList<>(Arrays.asList(
-            "%s nimmt die Armut auf"
+            "%s nimmt die Armut auf",
+            "%s akzeptiert die Armut"
     ));
 
     public final static List<String> ARMUT_RETURN = new ArrayList<>(Arrays.asList(
@@ -122,7 +125,7 @@ public class Statics {
             case BUBENDAMEN:
                 return "Buben-Damensolo";
             case FLEISCHLOS:
-                return "Fleischlos";
+                return Constants.FLEISCHLOS;
             case KREUZ:
                 return "Kreuzsolo";
             case PIK:
@@ -132,7 +135,7 @@ public class Statics {
             case KARO:
                 return "Karosolo";
             default:
-                return "";
+                return Constants.EMPTY_STRING;
         }
     }
 

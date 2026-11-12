@@ -1,14 +1,15 @@
 package base.messages.skat;
 
+import base.Constants;
 import base.messages.Message;
 
 public class MessageSchieben extends Message {
 
-    public final static String COMMAND = "schieben";
+    public final static String COMMAND = Constants.SKAT_SCHIEBEN_COMMAND;
 
     public MessageSchieben(String player) {
         this.command = COMMAND;
-        this.params.addProperty("player", player);
+        this.params.addProperty(Constants.PLAYER, player);
     }
 
     public MessageSchieben(Message message) {
@@ -17,6 +18,6 @@ public class MessageSchieben extends Message {
     }
 
     public String getPlayerName() {
-        return params.get("player").getAsString();
+        return params.get(Constants.PLAYER).getAsString();
     }
 }

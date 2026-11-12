@@ -1,12 +1,13 @@
 package base.messages;
 
+import base.Constants;
 public class MessageDisplayMessage extends Message {
 
-    public final static String COMMAND = "DisplayMessage";
+    public final static String COMMAND = Constants.DISPLAY_MESSAGE_COMMAND;
 
     public MessageDisplayMessage(String msg) {
         this.command = COMMAND;
-        this.params.addProperty("message", msg);
+        this.params.addProperty(Constants.MESSAGE, msg);
     }
 
     public MessageDisplayMessage(Message message) {
@@ -15,6 +16,6 @@ public class MessageDisplayMessage extends Message {
     }
 
     public String getText() {
-        return params.get("message").getAsString();
+        return params.get(Constants.MESSAGE).getAsString();
     }
 }

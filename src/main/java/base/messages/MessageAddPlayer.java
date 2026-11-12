@@ -1,12 +1,13 @@
 package base.messages;
 
+import base.Constants;
 public class MessageAddPlayer extends Message {
 
-    public final static String COMMAND = "AddPlayer";
+    public final static String COMMAND = Constants.ADD_PLAYER_COMMAND;
 
     public MessageAddPlayer(String name) {
         this.command = COMMAND;
-        this.params.addProperty("player", name);
+        this.params.addProperty(Constants.PLAYER, name);
     }
 
     public MessageAddPlayer(Message message) {
@@ -15,6 +16,6 @@ public class MessageAddPlayer extends Message {
     }
 
     public String getPlayerName() {
-        return params.get("player").getAsString();
+        return params.get(Constants.PLAYER).getAsString();
     }
 }
